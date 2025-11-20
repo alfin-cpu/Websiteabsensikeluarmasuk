@@ -17,7 +17,6 @@ const AttendanceSystem = () => {
     const [filterDate, setFilterDate] = useState('');
     const [photo, setPhoto] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
-    // Default mode diubah ke 'keluar' agar sesuai dengan posisi tombol baru di kiri
     const [attendanceMode, setAttendanceMode] = useState('keluar'); 
     
     // Daftar karyawan (diambil dari data sebelumnya)
@@ -242,10 +241,13 @@ const AttendanceSystem = () => {
         return (
             <div className="min-h-screen bg-gray-50 p-4 font-sans">
                 <div className="max-w-2xl mx-auto">
-                    {/* Header Utama - PERUBAHAN JUDUL */}
+                    {/* Header Utama - TANPA LOGO */}
                     <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
                         <div className="flex justify-between items-start">
                             <div>
+                                {/* Hapus atau komentar baris <img src="..." /> di sini */}
+                                {/* <img src="/logo-bea-cukai.png" alt="Logo Bea Cukai" className="h-12 w-auto mb-2" /> */}
+                                
                                 <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-1 leading-tight">ABSENSI IZIN KELUAR MASUK PPNPN</h1>
                                 <p className="text-xs text-gray-500 font-semibold">MITRA KPU BEA DAN CUKAI TANJUNG PRIOK TIPE A</p>
                                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm mt-3">
@@ -418,327 +420,99 @@ const AttendanceSystem = () => {
                                             <div className="mt-4 relative">
                                                 <img src={photoPreview} alt="Preview" className="w-full h-48 object-cover rounded-lg border-2 border-green-500 shadow-md" />
                                                 <span className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">PREVIEW FOTO</span>
-                                            </div>
-                                        )}
-                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
 
-                                    {/* Employee List */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-3">PILIH NAMA ANDA (TEKAN UNTUK ABSEN) *</label>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
-                                            {employeeList.map((name) => (
-                                                <button 
-                                                    key={name} 
-                                                    onClick={() => handleQuickAttendance(name)} 
-                                                    className="w-full text-left px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:from-green-100 hover:border-green-400 transition-all font-medium text-gray-800 flex items-center justify-between group shadow-sm text-sm"
-                                                >
-                                                    <span>{name}</span>
-                                                    <CheckCircle className="w-5 h-5 text-green-600 opacity-70 group-hover:opacity-100 transition-opacity" />
-                                                </button>
-                                            ))}
+                                        {/* Employee List */}
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-3">PILIH NAMA ANDA (TEKAN UNTUK ABSEN) *</label>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
+                                                {employeeList.map((name) => (
+                                                    <button 
+                                                        key={name} 
+                                                        onClick={() => handleQuickAttendance(name)} 
+                                                        className="w-full text-left px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:from-green-100 hover:border-green-400 transition-all font-medium text-gray-800 flex items-center justify-between group shadow-sm text-sm"
+                                                    >
+                                                        <span>{name}</span>
+                                                        <CheckCircle className="w-5 h-5 text-green-600 opacity-70 group-hover:opacity-100 transition-opacity" />
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // Tampilan 2: Server (Admin & PKD) - Header Server
+        return (
+            <div className="min-h-screen bg-gray-50 p-4 font-sans">
+                <div className="max-w-7xl mx-auto">
+                    {/* Header Server */}
+                    <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-2">DASHBOARD SERVER {serverType.toUpperCase()}</h1>
+                                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm">
+                                    <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
+                                        <Calendar className="w-4 h-4 text-indigo-600" />
+                                        <span>{currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
+                                        <Clock className="w-4 h-4 text-indigo-600" />
+                                        <span className="font-mono text-lg font-bold">{currentTime.toLocaleTimeString('id-ID')}</span>
+                                    </div>
                                 </div>
+                            </div>
+                            <button onClick={() => { setView('employee'); setIsServerAuth(false); setServerPassword(''); }} className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium shadow-md text-sm" >
+                                LOGOUT <LogOut className="w-4 h-4 inline ml-1"/>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Navigation Tabs (Tidak Berubah) */}
+                    <div className="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
+                        <div className="flex flex-wrap border-b border-gray-200">
+                            {serverType === 'admin' && (
+                                <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors border-r ${ activeTab === 'dashboard' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
+                                    <Users className="w-5 h-5" /> DASHBOARD
+                                </button>
+                            )}
+                            <button onClick={() => setActiveTab('riwayat')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors border-r ${ activeTab === 'riwayat' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
+                                <FileText className="w-5 h-5" /> RIWAYAT
+                            </button>
+                            {serverType === 'admin' && (
+                                <button onClick={() => setActiveTab('pengaturan')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors ${ activeTab === 'pengaturan' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
+                                    <Key className="w-5 h-5" /> PENGATURAN
+                                </button>
                             )}
                         </div>
-                    )}
-                </div>
-            </div>
-        );
-    }
-
-    // Tampilan 2: Server (Admin & PKD) - Tidak ada perubahan judul
-    return (
-        <div className="min-h-screen bg-gray-50 p-4 font-sans">
-            <div className="max-w-7xl mx-auto">
-                {/* Header Server */}
-                <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-2">DASHBOARD SERVER {serverType.toUpperCase()}</h1>
-                            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm">
-                                <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
-                                    <Calendar className="w-4 h-4 text-indigo-600" />
-                                    <span>{currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                                </div>
-                                <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
-                                    <Clock className="w-4 h-4 text-indigo-600" />
-                                    <span className="font-mono text-lg font-bold">{currentTime.toLocaleTimeString('id-ID')}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <button onClick={() => { setView('employee'); setIsServerAuth(false); setServerPassword(''); }} className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium shadow-md text-sm" >
-                            LOGOUT <LogOut className="w-4 h-4 inline ml-1"/>
-                        </button>
                     </div>
-                </div>
+                    
+                    {/* --- Konten Tab (Tidak Berubah) --- */}
 
-                {/* Navigation Tabs (Tidak Berubah) */}
-                <div className="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
-                    <div className="flex flex-wrap border-b border-gray-200">
-                        {serverType === 'admin' && (
-                            <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors border-r ${ activeTab === 'dashboard' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
-                                <Users className="w-5 h-5" /> DASHBOARD
-                            </button>
-                        )}
-                        <button onClick={() => setActiveTab('riwayat')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors border-r ${ activeTab === 'riwayat' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
-                            <FileText className="w-5 h-5" /> RIWAYAT
-                        </button>
-                        {serverType === 'admin' && (
-                            <button onClick={() => setActiveTab('pengaturan')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors ${ activeTab === 'pengaturan' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
-                                <Key className="w-5 h-5" /> PENGATURAN
-                            </button>
-                        )}
-                    </div>
-                </div>
-                
-                {/* --- Konten Tab (Tidak Berubah) --- */}
-
-                {/* Dashboard Tab (Admin Only) */}
-                {activeTab === 'dashboard' && serverType === 'admin' && (
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm font-medium">TOTAL ABSENSI</p>
-                                        <p className="text-4xl font-extrabold text-indigo-900">{stats.total}</p>
-                                    </div>
-                                    <FileText className="w-12 h-12 text-indigo-400 opacity-70" />
-                                </div>
-                            </div>
-                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm font-medium">KELUAR KANTOR</p>
-                                        <p className="text-4xl font-extrabold text-orange-600">{stats.keluar}</p>
-                                    </div>
-                                    <XCircle className="w-12 h-12 text-orange-400 opacity-70" />
-                                </div>
-                            </div>
-                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm font-medium">MASUK KANTOR</p>
-                                        <p className="text-4xl font-extrabold text-green-600">{stats.masuk}</p>
-                                    </div>
-                                    <CheckCircle className="w-12 h-12 text-green-400 opacity-70" />
-                                </div>
-                            </div>
-                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm font-medium">TOTAL KARYAWAN</p>
-                                        <p className="text-4xl font-extrabold text-purple-600">{stats.unique}</p>
-                                    </div>
-                                    <Users className="w-12 h-12 text-purple-400 opacity-70" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Recent Attendance */}
-                        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                            <h3 className="text-xl font-bold text-gray-800 mb-4">5 ABSENSI TERBARU</h3>
-                            <div className="space-y-3">
-                                {attendances.slice(0, 5).map((attendance) => (
-                                    <div key={attendance.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
-                                        {attendance.photo ? (
-                                            <button onClick={() => { setCurrentPhoto(attendance.photo); setShowPhotoModal(true); }}>
-                                                <img src={attendance.photo} alt={attendance.name} className="w-12 h-12 rounded-full object-cover border-2 border-indigo-400" />
-                                            </button>
-                                        ) : <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-xs">NO IMG</div>}
-                                        
-                                        <div className="flex-1">
-                                            <p className="font-bold text-gray-800">{attendance.name}</p>
-                                            <p className="text-xs text-gray-500">{attendance.date} ({attendance.timestamp})</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className={`px-3 py-1 text-xs font-bold rounded-full ${ attendance.type === 'masuk' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800' }`}> 
-                                                {attendance.type.toUpperCase()} - {attendance.customTime}
-                                            </span>
-                                            <LocationDisplay locationData={attendance.location} />
-                                        </div>
-                                    </div>
-                                ))}
-                                {attendances.length === 0 && (
-                                    <p className="text-center text-gray-500 py-8">BELUM ADA DATA ABSENSI</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Riwayat Tab (Admin & PKD) */}
-                {activeTab === 'riwayat' && (
-                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b pb-4">
-                            <h2 className="text-2xl font-bold text-gray-800"><FileText className="w-6 h-6 inline mr-2 text-indigo-600"/> RIWAYAT ABSENSI</h2>
-                            <div className="flex items-center gap-3">
-                                <input 
-                                    type="date" 
-                                    value={filterDate} 
-                                    onChange={(e) => setFilterDate(e.target.value)} 
-                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm text-sm" 
-                                />
-                                <button onClick={exportToCSV} className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium shadow-md text-sm" > 
-                                    <Download className="w-4 h-4" /> EXPORT CSV
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">FOTO</th>
-                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">NAMA</th>
-                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">TIPE</th>
-                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">WAKTU</th>
-                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">TANGGAL</th>
-                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">KEPERLUAN</th>
-                                        <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">LOKASI</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {filteredAttendances.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="7" className="px-4 py-8 text-center text-gray-500"> BELUM ADA DATA ABSENSI DENGAN FILTER INI </td>
-                                        </tr>
-                                    ) : (
-                                        filteredAttendances.map((attendance) => (
-                                            <tr key={attendance.id} className="hover:bg-indigo-50 transition-colors">
-                                                <td className="px-4 py-3"> 
-                                                    {attendance.photo && (
-                                                        <button onClick={() => { setCurrentPhoto(attendance.photo); setShowPhotoModal(true); }} className="block">
-                                                            <img src={attendance.photo} alt={attendance.name} className="w-10 h-10 rounded-full object-cover border border-gray-300 hover:border-indigo-600 transition-colors" />
-                                                        </button>
-                                                    )}
-                                                </td>
-                                                <td className="px-4 py-3 text-sm font-medium">{attendance.name}</td>
-                                                <td className="px-4 py-3"> 
-                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${ attendance.type === 'masuk' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800' }`}> 
-                                                        {attendance.type.toUpperCase()}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3 text-sm font-bold">{attendance.customTime}</td>
-                                                <td className="px-4 py-3 text-sm">{attendance.date} ({attendance.timestamp})</td>
-                                                <td className="px-4 py-3 text-sm text-gray-700 max-w-xs overflow-hidden truncate">{attendance.purpose || '-'}</td>
-                                                <td className="px-4 py-3">
-                                                    <LocationDisplay locationData={attendance.location} />
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
-                {showPhotoModal && <PhotoModal photoUrl={currentPhoto} onClose={() => setShowPhotoModal(false)} />}
-
-
-                {/* Pengaturan Tab (Admin Only) */}
-                {activeTab === 'pengaturan' && serverType === 'admin' && (
-                    <div className="space-y-6">
-                        {/* Kelola Password */}
-                        <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
-                            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><Key className="w-5 h-5 text-indigo-600"/> UBAH PASSWORD SERVER</h3>
-                            <div className="space-y-4">
-                                
-                                {!showPasswordChange ? (
-                                    <div className="flex flex-wrap gap-4">
-                                        {['admin', 'pkd'].map(user => (
-                                            <button 
-                                                key={user}
-                                                onClick={() => { setShowPasswordChange(true); setPasswordUserToChange(user); }} 
-                                                className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm" 
-                                            > 
-                                                <Key className="w-4 h-4" /> UBAH PASSWORD {user.toUpperCase()} 
-                                            </button>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="space-y-3 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
-                                        <p className="font-bold text-indigo-800">UBAH PASSWORD {passwordUserToChange.toUpperCase()}</p>
+                    {/* Dashboard Tab (Admin Only) */}
+                    {activeTab === 'dashboard' && serverType === 'admin' && (
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
+                                    <div className="flex items-center justify-between">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">PASSWORD BARU (MIN 6 KARAKTER)</label>
-                                            <input 
-                                                type="password" 
-                                                value={newPassword} 
-                                                onChange={(e) => setNewPassword(e.target.value)} 
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" 
-                                                placeholder="MASUKKAN PASSWORD BARU" 
-                                            />
+                                            <p className="text-gray-500 text-sm font-medium">TOTAL ABSENSI</p>
+                                            <p className="text-4xl font-extrabold text-indigo-900">{stats.total}</p>
                                         </div>
-                                        <div className="flex gap-2">
-                                            <button onClick={handlePasswordChange} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium" > SIMPAN </button>
-                                            <button onClick={() => { setShowPasswordChange(false); setNewPassword(''); }} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium" > BATAL </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Kelola Karyawan */}
-                        <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
-                            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><UserPlus className="w-5 h-5 text-purple-600"/> KELOLA KARYAWAN</h3>
-                            <div className="space-y-4">
-                                <p className="text-sm text-gray-600 font-medium">TOTAL KARYAWAN: {employeeList.length} ORANG</p>
-                                
-                                {/* Form Tambah Karyawan */}
-                                {!showAddEmployee ? (
-                                    <button onClick={() => setShowAddEmployee(true)} className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm" > 
-                                        <UserPlus className="w-4 h-4" /> TAMBAH KARYAWAN BARU 
-                                    </button>
-                                ) : (
-                                    <div className="space-y-3 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">NAMA KARYAWAN BARU</label>
-                                        <input 
-                                            type="text" 
-                                            value={newEmployeeName} 
-                                            onChange={(e) => setNewEmployeeName(e.target.value.toUpperCase())} 
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent uppercase" 
-                                            placeholder="MASUKKAN NAMA LENGKAP" 
-                                        />
-                                        <div className="flex gap-2">
-                                            <button onClick={handleAddEmployee} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium" > SIMPAN </button>
-                                            <button onClick={() => { setShowAddEmployee(false); setNewEmployeeName(''); }} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium" > BATAL </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Daftar Karyawan & Hapus */}
-                            <div className="mt-6">
-                                <h4 className="font-bold text-gray-700 mb-3">DAFTAR KARYAWAN (Klik Hapus):</h4>
-                                <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-3">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                        {employeeList.map((name, index) => (
-                                            <div key={name} className="flex items-center justify-between text-sm text-gray-700 bg-gray-50 px-3 py-2 rounded border border-gray-100">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-medium text-gray-500">{index + 1}.</span> 
-                                                    <span className="font-medium">{name}</span>
-                                                </div>
-                                                <button 
-                                                    onClick={() => handleRemoveEmployee(name)} 
-                                                    className="text-red-500 hover:text-red-700 transition-colors p-1 rounded hover:bg-red-100"
-                                                    title={`Hapus ${name}`}
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        ))}
+                                        <FileText className="w-12 h-12 text-indigo-400 opacity-70" />
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {/* Modal Foto (dipanggil di Riwayat dan Dashboard) */}
-                {showPhotoModal && <PhotoModal photoUrl={currentPhoto} onClose={() => setShowPhotoModal(false)} />}
-            </div>
-        </div>
-    );
-};
-
-export default AttendanceSystem;
+                                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-gray-500 text-sm font-medium">KELUAR KANTOR</p>
+                                            <p className="text-4xl font-extrabold text-orange-600">{stats.keluar}</p>
+                                        </div>
+                                        <XCircle className="w-1
