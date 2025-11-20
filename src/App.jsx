@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
     Calendar, Clock, MapPin, Users, CheckCircle, XCircle, FileText, 
-    Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2, Home 
+    Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2, Home, Settings 
 } from 'lucide-react'; // Pastikan lucide-react sudah terinstal
 
 // Fungsi bantuan untuk membuat URL Google Maps dari koordinat
-const createMapLink = (lat, lng) => `http://googleusercontent.com/maps?q=${lat},${lng}`;
+const createMapLink = (lat, lng) => `http://maps.google.com/maps?q=${lat},${lng}`;
 
 const AttendanceSystem = () => {
     // --- State Management ---
@@ -468,22 +468,4 @@ const AttendanceSystem = () => {
                             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm">
                                 <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
                                     <Calendar className="w-4 h-4 text-indigo-600" />
-                                    <span>{currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                                </div>
-                                <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
-                                    <Clock className="w-4 h-4 text-indigo-600" />
-                                    <span className="font-mono text-lg font-bold">{currentTime.toLocaleTimeString('id-ID')}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <button onClick={() => { setView('employee'); setIsServerAuth(false); setServerPassword(''); }} className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium shadow-md text-sm" >
-                            LOGOUT <LogOut className="w-4 h-4 inline ml-1"/>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Navigation Tabs */}
-                <div className="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
-                    <div className="flex flex-wrap border-b border-gray-200">
-                        {serverType === 'admin' && (
-                            <button onClick={() => setActive
+                                    <span>{currentTime.toLocaleDateString('id-ID', {
