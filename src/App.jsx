@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
     Calendar, Clock, MapPin, Users, CheckCircle, XCircle, FileText, 
-    Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2 
+    Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2, Home 
 } from 'lucide-react';
 
 // Fungsi bantuan untuk membuat URL Google Maps dari koordinat
@@ -148,7 +148,7 @@ const AttendanceSystem = () => {
         const newAttendance = {
             id: Date.now(),
             name: employeeName,
-            position: 'ANGGOTA', // Fixed Position
+            position: 'ANGGOTA', 
             type: type,
             customTime: customTime,
             purpose: purpose,
@@ -199,7 +199,6 @@ const AttendanceSystem = () => {
 
     const exportToCSV = () => {
         const headers = ['TANGGAL', 'WAKTU INPUT', 'NAMA', 'TIPE', 'WAKTU', 'KEPERLUAN', 'LOKASI (Lat, Lng)'];
-        // Menggunakan ; sebagai delimiter untuk kompatibilitas Excel Indonesia
         const rows = filteredAttendances.map(a => [a.date, a.timestamp, a.name, a.type.toUpperCase(), a.customTime, a.purpose || '-', a.location.replace(/,/g, '')] );
         const csv = [headers, ...rows].map(row => row.join(';')).join('\n'); 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -232,7 +231,7 @@ const AttendanceSystem = () => {
 
     const PhotoModal = ({ photoUrl, onClose }) => (
         <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4" onClick={onClose}>
-            <div className="bg-white rounded-lg p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
+            <div className="bg-white rounded-xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-end">
                     <button onClick={onClose} className="text-gray-700 hover:text-red-500">
                         <XCircle className="w-6 h-6"/>
@@ -249,29 +248,27 @@ const AttendanceSystem = () => {
     // Tampilan 1: Login Server atau Pegawai
     if (view === 'employee' || !isServerAuth) {
         return (
-            <div className="min-h-screen bg-gray-50 p-4 font-sans">
+            <div className="min-h-screen bg-gray-100 p-4 font-sans">
                 <div className="max-w-2xl mx-auto">
-                    {/* Header Utama - TANPA LOGO UNTUK MENGHINDARI ERROR VERCEL */}
-                    <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
+                    {/* Header Utama - Lebih Elegan */}
+                    <div className="bg-white rounded-3xl shadow-xl p-6 mb-6 border-t-8 border-indigo-600/70 backdrop-blur-sm">
                         <div className="flex justify-between items-start">
                             <div>
-                                {/* LOGO DIHILANGKAN */}
-                                
-                                <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-1 leading-tight">ABSENSI IZIN KELUAR MASUK PPNPN</h1>
-                                <p className="text-xs text-gray-500 font-semibold">MITRA KPU BEA DAN CUKAI TANJUNG PRIOK TIPE A</p>
+                                <h1 className="text-3xl md:text-4xl font-extrabold text-indigo-800 mb-1 leading-tight">SISTEM ABSENSI PPNPN</h1>
+                                <p className="text-sm text-gray-500 font-semibold">KPU BEA DAN CUKAI TANJUNG PRIOK TIPE A</p>
                                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm mt-3">
-                                    <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
-                                        <Calendar className="w-4 h-4 text-indigo-600" />
+                                    <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full text-indigo-700 font-medium">
+                                        <Calendar className="w-4 h-4" />
                                         <span>{currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
-                                        <Clock className="w-4 h-4 text-indigo-600" />
-                                        <span className="font-mono text-lg font-bold">{currentTime.toLocaleTimeString('id-ID')}</span>
+                                    <div className="flex items-center gap-2 bg-indigo-100 px-3 py-1 rounded-full text-indigo-800">
+                                        <Clock className="w-4 h-4" />
+                                        <span className="font-mono text-xl font-extrabold">{currentTime.toLocaleTimeString('id-ID')}</span>
                                     </div>
                                 </div>
                             </div>
-                            <button onClick={() => { setView('server'); setIsServerAuth(false); }} className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-full hover:bg-indigo-700 transition-colors shadow-md text-sm" >
-                                <Lock className="w-4 h-4" /> <span className="hidden sm:inline">SERVER</span>
+                            <button onClick={() => { setView('server'); setIsServerAuth(false); }} className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-full hover:bg-indigo-700 transition-all shadow-lg text-sm" >
+                                <Lock className="w-4 h-4" /> SERVER
                             </button>
                         </div>
                     </div>
@@ -288,15 +285,15 @@ const AttendanceSystem = () => {
                                         value={serverPassword} 
                                         onChange={(e) => setServerPassword(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && handleServerLogin()}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent uppercase shadow-sm" 
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 uppercase shadow-inner transition-shadow" 
                                         placeholder="MASUKKAN PASSWORD SERVER" 
                                     />
                                 </div>
-                                <button onClick={handleServerLogin} className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200" >
+                                <button onClick={handleServerLogin} className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-xl shadow-indigo-300/80" >
                                     <LogIn className="w-5 h-5 inline mr-2"/> LOGIN
                                 </button>
                                 <button onClick={() => setView('employee')} className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors" > 
-                                    KEMBALI KE ABSENSI
+                                    <Home className="w-4 h-4 inline mr-2"/> KEMBALI KE ABSENSI
                                 </button>
                             </div>
                         </div>
@@ -304,41 +301,41 @@ const AttendanceSystem = () => {
                         /* Tampilan Absensi Pegawai */
                         <div className="space-y-6">
                             
-                            {/* Mode Switch & Lokasi */}
-                            <div className="bg-white rounded-xl shadow-lg p-4 flex flex-col md:flex-row justify-between items-center gap-4 border border-gray-100">
+                            {/* Mode Switch & Lokasi - Dibuat Lebih Rapi */}
+                            <div className="bg-white rounded-xl shadow-lg p-4 flex flex-col md:flex-row justify-between items-center gap-4 border border-gray-200">
                                 <div className="flex gap-3 w-full md:w-auto">
                                     <button 
                                         onClick={() => setAttendanceMode('keluar')} 
-                                        className={`flex-1 py-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 text-sm ${
-                                            attendanceMode === 'keluar' ? 'bg-orange-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-orange-50'
+                                        className={`flex-1 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm shadow-md ${
+                                            attendanceMode === 'keluar' ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-red-300/50' : 'bg-gray-100 text-gray-700 hover:bg-orange-50'
                                         }`}
                                     >
-                                        <LogOut className="w-5 h-5" /> ABSENSI KELUAR 
+                                        <LogOut className="w-5 h-5" /> KELUAR 
                                     </button>
                                     <button 
                                         onClick={() => setAttendanceMode('masuk')} 
-                                        className={`flex-1 py-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 text-sm ${
-                                            attendanceMode === 'masuk' ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-green-50'
+                                        className={`flex-1 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm shadow-md ${
+                                            attendanceMode === 'masuk' ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white shadow-teal-300/50' : 'bg-gray-100 text-gray-700 hover:bg-green-50'
                                         }`}
                                     > 
-                                        <LogIn className="w-5 h-5" /> ABSEN MASUK
+                                        <LogIn className="w-5 h-5" /> MASUK
                                     </button>
                                 </div>
-                                <div className="text-center md:text-right w-full md:w-auto">
-                                    <p className="text-xs text-gray-500">LOKASI GPS:</p>
+                                <div className="text-center md:text-right w-full md:w-auto p-2 bg-gray-50 rounded-lg">
+                                    <p className="text-xs text-gray-500">POSISI ANDA:</p>
                                     <div className="flex items-center justify-center md:justify-end">
                                         {location ? (
                                             <a 
                                                 href={createMapLink(location.lat, location.lng)} 
                                                 target="_blank" 
                                                 rel="noopener noreferrer" 
-                                                className={`flex items-center gap-1 text-sm font-medium ${location.failed ? 'text-red-500' : 'text-blue-600 hover:text-blue-700'}`}
+                                                className={`flex items-center gap-1 text-sm font-bold ${location.failed ? 'text-red-500' : 'text-blue-600 hover:text-blue-700'}`}
                                             >
                                                 <MapPin className="w-4 h-4" /> 
-                                                {location.failed ? 'LOKASI TIDAK DITEMUKAN' : 'Lokasi Terdeteksi'}
+                                                {location.failed ? 'GPS ERROR' : 'LOKASI TERDETEKSI'}
                                             </a>
                                         ) : (
-                                            <span className="text-sm text-gray-500 flex items-center gap-1"><MapPin className="w-4 h-4 animate-pulse"/>Memuat...</span>
+                                            <span className="text-sm text-gray-500 flex items-center gap-1"><MapPin className="w-4 h-4 animate-pulse"/>Memuat GPS...</span>
                                         )}
                                     </div>
                                 </div>
@@ -346,19 +343,19 @@ const AttendanceSystem = () => {
 
                             {/* Absensi Keluar Mode */}
                             {attendanceMode === 'keluar' ? (
-                                <div className="bg-white rounded-xl shadow-2xl p-6 border-t-4 border-orange-600">
-                                    <h2 className="text-2xl font-bold text-gray-800 mb-2">ABSENSI KELUAR 🟠</h2>
-                                    <p className="text-orange-600 text-sm font-bold mb-6">* SEMUA KOLOM WAJIB DIISI</p>
-                                    <div className="space-y-4">
+                                <div className="bg-white rounded-xl shadow-2xl p-6 border-t-8 border-orange-500">
+                                    <h2 className="text-2xl font-extrabold text-gray-800 mb-2 flex items-center"><LogOut className='w-6 h-6 mr-2 text-orange-500'/> ABSENSI KELUAR</h2>
+                                    <p className="text-orange-600 text-sm font-bold mb-6 border-b pb-2 border-dashed">Pastikan semua data terisi dan foto selfie Anda jelas.</p>
+                                    <div className="space-y-5">
                                         {/* Nama */}
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">NAMA KARYAWAN *</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">NAMA KARYAWAN <span className='text-red-500'>*</span></label>
                                             <select 
                                                 value={formData.name} 
                                                 onChange={(e) => setFormData({...formData, name: e.target.value})} 
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent uppercase shadow-sm"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 uppercase shadow-inner"
                                             >
-                                                <option value="">PILIH NAMA</option>
+                                                <option value="">-- PILIH NAMA DARI DAFTAR --</option>
                                                 {employeeList.map((name) => (
                                                     <option key={name} value={name}>{name}</option>
                                                 ))}
@@ -366,79 +363,80 @@ const AttendanceSystem = () => {
                                         </div>
                                         {/* Waktu */}
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">WAKTU KELUAR *</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">WAKTU KELUAR <span className='text-red-500'>*</span></label>
                                             <input 
                                                 type="time" 
                                                 value={formData.customTime} 
                                                 onChange={(e) => setFormData({...formData, customTime: e.target.value})} 
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent shadow-sm" 
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 shadow-inner" 
                                             />
                                         </div>
                                         {/* Keperluan */}
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">KEPERLUAN *</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">KEPERLUAN <span className='text-red-500'>*</span></label>
                                             <textarea 
                                                 value={formData.purpose} 
                                                 onChange={(e) => setFormData({...formData, purpose: e.target.value})} 
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent uppercase shadow-sm" 
-                                                placeholder="ISI KEPERLUAN KELUAR KANTOR (Contoh: DINAS LUAR)" rows="3" 
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 uppercase shadow-inner" 
+                                                placeholder="Contoh: DINAS LUAR / KEPERLUAN PRIBADI" rows="3" 
                                             />
                                         </div>
                                         {/* Foto */}
-                                        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                                            <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center"><UserCheck className="w-4 h-4 mr-1 text-orange-600"/> FOTO WAJIB *</label>
+                                        <div className="bg-orange-50 p-4 rounded-xl border border-orange-200">
+                                            <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center"><UserCheck className="w-4 h-4 mr-1 text-orange-600"/> AMBIL FOTO SELFIE (WAJIB) <span className='text-red-500'>*</span></label>
                                             <input 
                                                 type="file" 
                                                 accept="image/*" 
                                                 capture="user" 
                                                 onChange={handlePhotoChange} 
-                                                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-100 file:text-orange-700 hover:file:bg-orange-200"
+                                                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-200 file:text-orange-800 hover:file:bg-orange-300 transition-colors cursor-pointer"
                                             />
                                             {photoPreview && (
                                                 <div className="mt-4 relative">
-                                                    <img src={photoPreview} alt="Preview" className="w-full h-48 object-cover rounded-lg border-2 border-orange-500 shadow-md" />
-                                                    <span className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">PREVIEW FOTO</span>
+                                                    <img src={photoPreview} alt="Preview" className="w-full h-48 object-cover rounded-xl border-4 border-orange-500 shadow-lg" />
+                                                    <span className="absolute top-2 right-2 bg-black bg-opacity-60 text-white text-xs px-3 py-1 rounded-full font-bold">PREVIEW</span>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <button onClick={handleSubmitKeluar} className="w-full bg-orange-600 text-white py-3 rounded-lg font-bold hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-orange-200" > 
-                                            <LogOut className="w-5 h-5" /> CATAT ABSENSI KELUAR
+                                        <button onClick={handleSubmitKeluar} className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-xl font-extrabold hover:from-orange-700 hover:to-red-700 transition-all flex items-center justify-center gap-2 shadow-xl shadow-orange-300/80" > 
+                                            <LogOut className="w-5 h-5" /> SUBMIT ABSENSI KELUAR
                                         </button>
                                     </div>
                                 </div>
-                            ) : ( // Ini adalah bagian ELSE dari ternary operator.
-                                <div className="bg-white rounded-xl shadow-2xl p-6 border-t-4 border-green-600">
-                                    <h2 className="text-2xl font-bold text-gray-800 mb-2">ABSEN MASUK 🟢</h2>
-                                    <p className="text-gray-600 text-sm mb-6">Ambil foto selfie jelas, lalu tekan nama Anda.</p>
+                            ) : ( 
+                                {/* Absen Masuk Mode */}
+                                <div className="bg-white rounded-xl shadow-2xl p-6 border-t-8 border-green-500">
+                                    <h2 className="text-2xl font-extrabold text-gray-800 mb-2 flex items-center"><LogIn className='w-6 h-6 mr-2 text-green-500'/> ABSENSI MASUK</h2>
+                                    <p className="text-gray-600 text-sm mb-6 border-b pb-2 border-dashed">Langkah Cepat: Ambil foto, lalu tekan nama Anda untuk absen.</p>
 
                                     {/* Foto */}
-                                    <div className="mb-6 bg-green-50 p-4 rounded-lg border border-green-200">
-                                        <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center"><UserCheck className="w-4 h-4 mr-1 text-green-600"/> FOTO WAJIB *</label>
+                                    <div className="mb-6 bg-green-50 p-4 rounded-xl border border-green-200">
+                                        <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center"><UserCheck className="w-4 h-4 mr-1 text-green-600"/> AMBIL FOTO SELFIE (WAJIB) <span className='text-red-500'>*</span></label>
                                         <input 
                                             type="file" 
                                             accept="image/*" 
                                             capture="user" 
                                             onChange={handlePhotoChange} 
-                                            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
+                                            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-200 file:text-green-800 hover:file:bg-green-300 transition-colors cursor-pointer"
                                         />
                                         {photoPreview && (
                                             <div className="mt-4 relative">
-                                                <img src={photoPreview} alt="Preview" className="w-full h-48 object-cover rounded-lg border-2 border-green-500 shadow-md" />
-                                                <span className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">PREVIEW FOTO</span>
+                                                <img src={photoPreview} alt="Preview" className="w-full h-48 object-cover rounded-xl border-4 border-green-500 shadow-lg" />
+                                                <span className="absolute top-2 right-2 bg-black bg-opacity-60 text-white text-xs px-3 py-1 rounded-full font-bold">PREVIEW</span>
                                             </div>
                                         )}
                                     </div>
 
                                     {/* Employee List */}
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-3">PILIH NAMA ANDA (TEKAN UNTUK ABSEN) *</label>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
+                                        <label className="block text-base font-extrabold text-gray-800 mb-4">PILIH NAMA ANDA DI BAWAH <span className='text-red-500'>*</span></label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto p-2 bg-gray-50 rounded-lg border border-gray-200">
                                             {employeeList.map((name) => (
                                                 <button 
                                                     key={name} 
                                                     onClick={() => handleQuickAttendance(name)} 
-                                                    className="w-full text-left px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:from-green-100 hover:border-green-400 transition-all font-medium text-gray-800 flex items-center justify-between group shadow-sm text-sm"
+                                                    className="w-full text-left px-4 py-3 bg-white border border-green-300 rounded-xl hover:bg-green-50 hover:border-green-500 transition-all font-semibold text-gray-800 flex items-center justify-between group shadow-md text-sm"
                                                 >
                                                     <span>{name}</span>
                                                     <CheckCircle className="w-5 h-5 text-green-600 opacity-70 group-hover:opacity-100 transition-opacity" />
@@ -457,7 +455,7 @@ const AttendanceSystem = () => {
 
     // Tampilan 2: Server (Admin & PKD)
     return (
-        <div className="min-h-screen bg-gray-50 p-4 font-sans">
+        <div className="min-h-screen bg-gray-100 p-4 font-sans">
             {showPhotoModal && <PhotoModal photoUrl={currentPhoto} onClose={() => setShowPhotoModal(false)} />}
             <div className="max-w-7xl mx-auto">
                 
@@ -521,4 +519,181 @@ const AttendanceSystem = () => {
                             <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-gray-500 text-sm font-medium">KELUAR KANT
+                                        <p className="text-gray-500 text-sm font-medium">KELUAR KANTOR</p>
+                                        <p className="text-4xl font-extrabold text-orange-600">{stats.keluar}</p>
+                                    </div>
+                                    <LogOut className="w-12 h-12 text-orange-400 opacity-70" />
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium">MASUK KANTOR</p>
+                                        <p className="text-4xl font-extrabold text-green-600">{stats.masuk}</p>
+                                    </div>
+                                    <LogIn className="w-12 h-12 text-green-400 opacity-70" />
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-gray-500">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium">TOTAL KARYAWAN</p>
+                                        <p className="text-4xl font-extrabold text-gray-800">{stats.unique}</p>
+                                    </div>
+                                    <Users className="w-12 h-12 text-gray-400 opacity-70" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                
+                {/* Riwayat Tab */}
+                {activeTab === 'riwayat' && (
+                    <div className="bg-white rounded-xl shadow-2xl p-6 space-y-4">
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4">
+                            <h2 className="text-2xl font-extrabold text-indigo-800 flex items-center"><FileText className='w-6 h-6 mr-2 text-indigo-500'/> RIWAYAT ABSENSI</h2>
+                            <div className="flex gap-2 w-full md:w-auto">
+                                <input 
+                                    type="date" 
+                                    value={filterDate} 
+                                    onChange={(e) => setFilterDate(e.target.value)}
+                                    className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 w-full md:w-40 text-sm"
+                                />
+                                <button onClick={exportToCSV} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm shadow-md">
+                                    <Download className="w-4 h-4"/> Export CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        {['TANGGAL', 'WAKTU', 'NAMA', 'TIPE', 'WAKTU KUSTOM', 'KEPERLUAN', 'LOKASI', 'FOTO'].map(header => (
+                                            <th key={header} className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{header}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {filteredAttendances.length > 0 ? (
+                                        filteredAttendances.sort((a, b) => new Date(b.fullTimestamp) - new Date(a.fullTimestamp)).map((a) => (
+                                            <tr key={a.id} className="hover:bg-indigo-50 transition-colors">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{a.date}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500">{a.timestamp}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">{a.name}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`px-3 inline-flex text-xs leading-5 font-semibold rounded-full ${a.type === 'keluar' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
+                                                        {a.type.toUpperCase()}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{a.customTime}</td>
+                                                <td className="px-6 py-4 max-w-xs truncate text-sm text-gray-500">{a.purpose}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <LocationDisplay locationData={a.location} />
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <button 
+                                                        onClick={() => { setCurrentPhoto(a.photo); setShowPhotoModal(true); }} 
+                                                        className="text-indigo-600 hover:text-indigo-900 text-xs font-medium border border-indigo-300 px-3 py-1 rounded-full hover:bg-indigo-50 transition-colors"
+                                                    >
+                                                        Lihat
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="8" className="px-6 py-8 text-center text-gray-500 text-sm">TIDAK ADA DATA ABSENSI DITEMUKAN.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* Pengaturan Tab (Admin Only) */}
+                {activeTab === 'pengaturan' && serverType === 'admin' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        {/* 1. Manajemen Karyawan */}
+                        <div className="bg-white rounded-xl shadow-2xl p-6 space-y-6 border-t-4 border-green-500">
+                            <h2 className="text-xl font-bold text-gray-800 border-b pb-3 flex items-center"><Users className='w-5 h-5 mr-2 text-green-600'/> MANAJEMEN KARYAWAN</h2>
+                            
+                            {/* Tambah Karyawan */}
+                            <button onClick={() => setShowAddEmployee(!showAddEmployee)} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium shadow-md">
+                                <UserPlus className="w-4 h-4"/> {showAddEmployee ? 'BATAL TAMBAH' : 'TAMBAH KARYAWAN BARU'}
+                            </button>
+                            {showAddEmployee && (
+                                <div className="bg-green-50 p-4 rounded-lg border border-green-200 space-y-3">
+                                    <input 
+                                        type="text" 
+                                        value={newEmployeeName} 
+                                        onChange={(e) => setNewEmployeeName(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 uppercase" 
+                                        placeholder="NAMA LENGKAP KARYAWAN" 
+                                    />
+                                    <button onClick={handleAddEmployee} className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700">
+                                        SIMPAN KARYAWAN
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Daftar Karyawan */}
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-700 mb-3">DAFTAR AKTIF ({employeeList.length})</h3>
+                                <div className="max-h-60 overflow-y-auto p-2 border rounded-lg bg-gray-50 space-y-2">
+                                    {employeeList.map((name) => (
+                                        <div key={name} className="flex justify-between items-center bg-white p-3 rounded-md shadow-sm border border-gray-200">
+                                            <span className="text-sm font-medium">{name}</span>
+                                            <button onClick={() => handleRemoveEmployee(name)} className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition-colors">
+                                                <Trash2 className="w-4 h-4"/>
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 2. Manajemen Password */}
+                        <div className="bg-white rounded-xl shadow-2xl p-6 space-y-6 border-t-4 border-indigo-500">
+                            <h2 className="text-xl font-bold text-gray-800 border-b pb-3 flex items-center"><Key className='w-5 h-5 mr-2 text-indigo-600'/> MANAJEMEN PASSWORD SERVER</h2>
+                            
+                            <p className="text-sm text-gray-600">Password saat ini untuk Admin: `*****` | PKD: `*****`</p>
+
+                            <button onClick={() => setShowPasswordChange(!showPasswordChange)} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors font-medium shadow-md">
+                                <Lock className="w-4 h-4"/> UBAH PASSWORD SERVER
+                            </button>
+                            
+                            {showPasswordChange && (
+                                <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200 space-y-3">
+                                    <label className="block text-sm font-bold text-gray-700">PILIH USER</label>
+                                    <select 
+                                        value={passwordUserToChange} 
+                                        onChange={(e) => setPasswordUserToChange(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 uppercase"
+                                    >
+                                        <option value="admin">ADMIN</option>
+                                        <option value="pkd">PKD</option>
+                                    </select>
+                                    <input 
+                                        type="password" 
+                                        value={newPassword} 
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" 
+                                        placeholder="MASUKKAN PASSWORD BARU (Min 6 Karakter)" 
+                                    />
+                                    <button onClick={handlePasswordChange} className="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700">
+                                        KONFIRMASI UBAH PASSWORD
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default AttendanceSystem;
