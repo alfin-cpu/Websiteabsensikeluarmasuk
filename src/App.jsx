@@ -2,33 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { 
     Calendar, Clock, MapPin, Users, CheckCircle, XCircle, FileText, 
     Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2, Home 
-} from 'lucide-react';
+} from 'lucide-react'; // Pastikan lucide-react sudah terinstal
 
 // Fungsi bantuan untuk membuat URL Google Maps dari koordinat
-const createMapLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+const createMapLink = (lat, lng) => `http://googleusercontent.com/maps?q=${lat},${lng}`;
 
 const AttendanceSystem = () => {
     // --- State Management ---
     const [currentTime, setCurrentTime] = useState(new Date());
     const [attendances, setAttendances] = useState([]);
-    const [view, setView] = useState('employee');
+    const [view, setView] = useState('employee'); // 'employee' atau 'server'
     const [serverPassword, setServerPassword] = useState('');
     const [isServerAuth, setIsServerAuth] = useState(false);
-    const [serverType, setServerType] = useState('');
-    const [activeTab, setActiveTab] = useState('dashboard');
+    const [serverType, setServerType] = useState(''); // 'admin' atau 'pkd'
+    const [activeTab, setActiveTab] = useState('dashboard'); // untuk view 'server'
     const [formData, setFormData] = useState({ name: '', purpose: '', customTime: '' });
-    const [location, setLocation] = useState(null); // { lat, lng }
+    const [location, setLocation] = useState(null); // { lat, lng, failed: boolean }
     const [filterDate, setFilterDate] = useState('');
-    const [photo, setPhoto] = useState(null);
-    const [photoPreview, setPhotoPreview] = useState(null);
-    const [attendanceMode, setAttendanceMode] = useState('keluar'); 
+    const [photo, setPhoto] = useState(null); // File object
+    const [photoPreview, setPhotoPreview] = useState(null); // Data URL for preview
+    const [attendanceMode, setAttendanceMode] = useState('keluar'); // 'keluar' atau 'masuk'
     
-    // Data Karyawan Awal (Dapat Diubah melalui Pengaturan)
+    // Data Karyawan Awal (Dapat Diubah melalui Pengaturan Admin)
     const [employeeList, setEmployeeList] = useState([
         'AGUNG TRI WARDANI', 'AHMAD SYAIFUL', 'AJI KURNIA RAMADHAN', 'ANAS FAUZI', 'ANAZYAH ZUROH', 'ANDI R FASHA JUANDI', 'ANTORO', 'ARI PURNOMO', 'ARIE SUPRIYANTO', 'ARIEF SUPRIYONO', 'ARIF WAHYUDI', 'ASA FATHIKHLAASH', 'AYI', 'AYOM WAHYU N', 'DESI APRILIENI', 'DEWI SARTIKA', 'DIMAS AR RASYID', 'DODY APRIYANA', 'ENDAY', 'GUSTAMININGSIH', 'HADI', 'HADI PURNOMO', 'HASANUDIN', 'HAYADI', 'HENDIYANA', 'INDRI SUSANTI', 'INRA EFFENDI ASRI', 'IRMA HARTINI', 'JOKO SUKENDRO', 'KHAIRUDDIN', 'LILI TOLANI', 'M ZAINAL RIZKI', 'MAMIK WIYANTO', 'MUHAMAD ALFAZRI', 'MUHAMMAD ALFINAS', 'MUHLISIN', 'NOPI HARYANTI', 'PRIYANTO', 'REVAN SAPUTRA', 'RUKMAN HAKIM', 'SAEPUDIN', 'SAHRONI', 'SANDI ALJABAR', 'SONY DARMAWAN', 'SUANDA', 'SUKASAH', 'SUPRIYANTO', 'SUWARNO', 'SUYARTO', 'TARMAN', 'TARJONO', 'TOYA SAMODRA', 'ULUT SURYANA', 'UYUM JUMHANA', 'WACA WIJAYA', 'WAHYUDIN', 'WAODE INDAH FARIDA', 'WARMIN', 'YAYAN HARYANTO', 'YATNO WIDIYATNO'
     ].sort());
     
-    // Password untuk Login Server
+    // Password untuk Login Server (sesuaikan jika perlu)
     const [passwords, setPasswords] = useState({ admin: 'admin123', pkd: 'pkd123' });
     
     // State untuk Pengaturan
@@ -55,16 +55,17 @@ const AttendanceSystem = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    setLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
+                    setLocation({ lat: position.coords.latitude, lng: position.coords.longitude, failed: false });
                 },
                 (error) => {
                     console.error("Error getting geolocation:", error);
-                    setLocation({ lat: -6.1751, lng: 106.8650, failed: true });
+                    // Koordinat default jika gagal, misal KPU Tanjung Priok
+                    setLocation({ lat: -6.1030, lng: 106.8837, failed: true }); 
                 }
             );
         } else {
              console.warn("Geolocation not supported by this browser.");
-             setLocation({ lat: -6.1751, lng: 106.8650, failed: true });
+             setLocation({ lat: -6.1030, lng: 106.8837, failed: true });
         }
     }, []);
 
@@ -80,7 +81,7 @@ const AttendanceSystem = () => {
             setIsServerAuth(true);
             setServerType('pkd');
             setView('server');
-            setActiveTab('riwayat');
+            setActiveTab('riwayat'); // PKD langsung ke Riwayat
         } else {
             alert('PASSWORD SALAH!');
         }
@@ -148,15 +149,15 @@ const AttendanceSystem = () => {
         const newAttendance = {
             id: Date.now(),
             name: employeeName,
-            position: 'ANGGOTA', 
-            type: type,
+            position: 'ANGGOTA', // Bisa disesuaikan jika ada field posisi
+            type: type, // 'masuk' atau 'keluar'
             customTime: customTime,
             purpose: purpose,
             date: currentTime.toLocaleDateString('id-ID'),
             timestamp: currentTime.toLocaleTimeString('id-ID'),
             location: location.failed ? 'LOKASI TIDAK TERSEDIA' : `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`, 
             photo: photoPreview,
-            fullTimestamp: currentTime.toISOString()
+            fullTimestamp: currentTime.toISOString() // Untuk sorting
         };
 
         setAttendances([newAttendance, ...attendances]);
@@ -194,7 +195,7 @@ const AttendanceSystem = () => {
         total: attendances.length,
         keluar: attendances.filter(a => a.type === 'keluar').length,
         masuk: attendances.filter(a => a.type === 'masuk').length,
-        unique: employeeList.length 
+        unique: new Set(attendances.map(a => a.name)).size // Menghitung karyawan unik yang sudah absen
     };
 
     const exportToCSV = () => {
@@ -248,7 +249,7 @@ const AttendanceSystem = () => {
     // Tampilan 1: Login Server atau Pegawai
     if (view === 'employee' || !isServerAuth) {
         return (
-            <div className="min-h-screen bg-gray-100 p-4 font-sans">
+            <div className="min-h-screen bg-gray-100 p-4 font-sans antialiased">
                 <div className="max-w-2xl mx-auto">
                     {/* Header Utama - Lebih Elegan */}
                     <div className="bg-white rounded-3xl shadow-xl p-6 mb-6 border-t-8 border-indigo-600/70 backdrop-blur-sm">
@@ -310,7 +311,7 @@ const AttendanceSystem = () => {
                                             attendanceMode === 'keluar' ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-red-300/50' : 'bg-gray-100 text-gray-700 hover:bg-orange-50'
                                         }`}
                                     >
-                                        <LogOut className="w-5 h-5" /> KELUAR 
+                                        <LogOut className="w-5 h-5" /> ABSEN KELUAR 
                                     </button>
                                     <button 
                                         onClick={() => setAttendanceMode('masuk')} 
@@ -318,7 +319,7 @@ const AttendanceSystem = () => {
                                             attendanceMode === 'masuk' ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white shadow-teal-300/50' : 'bg-gray-100 text-gray-700 hover:bg-green-50'
                                         }`}
                                     > 
-                                        <LogIn className="w-5 h-5" /> MASUK
+                                        <LogIn className="w-5 h-5" /> ABSEN MASUK
                                     </button>
                                 </div>
                                 <div className="text-center md:text-right w-full md:w-auto p-2 bg-gray-50 rounded-lg">
@@ -431,4 +432,58 @@ const AttendanceSystem = () => {
                                     {/* Employee List */}
                                     <div>
                                         <label className="block text-base font-extrabold text-gray-800 mb-4">PILIH NAMA ANDA DI BAWAH <span className='text-red-500'>*</span></label>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto p-2 bg-gray-50 rounded-lg border border-gray-200">
+                                            {employeeList.map((name) => (
+                                                <button 
+                                                    key={name} 
+                                                    onClick={() => handleQuickAttendance(name)} 
+                                                    className="w-full text-left px-4 py-3 bg-white border border-green-300 rounded-xl hover:bg-green-50 hover:border-green-500 transition-all font-semibold text-gray-800 flex items-center justify-between group shadow-md text-sm"
+                                                >
+                                                    <span>{name}</span>
+                                                    <CheckCircle className="w-5 h-5 text-green-600 opacity-70 group-hover:opacity-100 transition-opacity" />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    // Tampilan 2: Server (Admin & PKD)
+    return (
+        <div className="min-h-screen bg-gray-100 p-4 font-sans antialiased">
+            {showPhotoModal && <PhotoModal photoUrl={currentPhoto} onClose={() => setShowPhotoModal(false)} />}
+            <div className="max-w-7xl mx-auto">
+                
+                {/* Header Server */}
+                <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-2">DASHBOARD SERVER {serverType.toUpperCase()}</h1>
+                            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm">
+                                <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
+                                    <Calendar className="w-4 h-4 text-indigo-600" />
+                                    <span>{currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                </div>
+                                <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
+                                    <Clock className="w-4 h-4 text-indigo-600" />
+                                    <span className="font-mono text-lg font-bold">{currentTime.toLocaleTimeString('id-ID')}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onClick={() => { setView('employee'); setIsServerAuth(false); setServerPassword(''); }} className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium shadow-md text-sm" >
+                            LOGOUT <LogOut className="w-4 h-4 inline ml-1"/>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Navigation Tabs */}
+                <div className="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
+                    <div className="flex flex-wrap border-b border-gray-200">
+                        {serverType === 'admin' && (
+                            <button onClick={() => setActive
