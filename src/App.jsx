@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-// Pastikan Anda telah menginstal 'lucide-react' (npm install lucide-react)
 import { 
     Calendar, Clock, MapPin, Users, CheckCircle, XCircle, FileText, 
     Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2 
 } from 'lucide-react';
 
-// Fungsi bantuan untuk membuat URL Google Maps
+// Fungsi bantuan untuk membuat URL Google Maps dari koordinat
 const createMapLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
 const AttendanceSystem = () => {
@@ -58,12 +57,14 @@ const AttendanceSystem = () => {
                 (position) => {
                     setLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
                 },
-                () => {
+                (error) => {
                     // Fallback jika GPS gagal atau ditolak (contoh koordinat Jakarta)
+                    console.error("Error getting geolocation:", error);
                     setLocation({ lat: -6.1751, lng: 106.8650, failed: true });
                 }
             );
         } else {
+             console.warn("Geolocation not supported by this browser.");
              setLocation({ lat: -6.1751, lng: 106.8650, failed: true });
         }
     }, []);
@@ -255,7 +256,7 @@ const AttendanceSystem = () => {
                     <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
                         <div className="flex justify-between items-start">
                             <div>
-                                {/* LOGO DIHILANGKAN DARI SINI */}
+                                {/* LOGO DIHILANGKAN */}
                                 
                                 <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-1 leading-tight">ABSENSI IZIN KELUAR MASUK PPNPN</h1>
                                 <p className="text-xs text-gray-500 font-semibold">MITRA KPU BEA DAN CUKAI TANJUNG PRIOK TIPE A</p>
@@ -427,34 +428,34 @@ const AttendanceSystem = () => {
                                             <div className="mt-4 relative">
                                                 <img src={photoPreview} alt="Preview" className="w-full h-48 object-cover rounded-lg border-2 border-green-500 shadow-md" />
                                                 <span className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">PREVIEW FOTO</span>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Employee List */}
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-700 mb-3">PILIH NAMA ANDA (TEKAN UNTUK ABSEN) *</label>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
-                                                {employeeList.map((name) => (
-                                                    <button 
-                                                        key={name} 
-                                                        onClick={() => handleQuickAttendance(name)} 
-                                                        className="w-full text-left px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:from-green-100 hover:border-green-400 transition-all font-medium text-gray-800 flex items-center justify-between group shadow-sm text-sm"
-                                                    >
-                                                        <span>{name}</span>
-                                                        <CheckCircle className="w-5 h-5 text-green-600 opacity-70 group-hover:opacity-100 transition-opacity" />
-                                                    </button>
-                                                ))}
                                             </div>
+                                        )}
+                                    </div>
+
+                                    {/* Employee List */}
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-3">PILIH NAMA ANDA (TEKAN UNTUK ABSEN) *</label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
+                                            {employeeList.map((name) => (
+                                                <button 
+                                                    key={name} 
+                                                    onClick={() => handleQuickAttendance(name)} 
+                                                    className="w-full text-left px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg hover:from-green-100 hover:border-green-400 transition-all font-medium text-gray-800 flex items-center justify-between group shadow-sm text-sm"
+                                                >
+                                                    <span>{name}</span>
+                                                    <CheckCircle className="w-5 h-5 text-green-600 opacity-70 group-hover:opacity-100 transition-opacity" />
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
-            );
-        }
+            </div>
+        );
+    }
 
     // Tampilan 2: Server (Admin & PKD)
     return (
@@ -514,220 +515,4 @@ const AttendanceSystem = () => {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-gray-500 text-sm font-medium">TOTAL ABSENSI</p>
-                                        <p className="text-4xl font-extrabold text-indigo-900">{stats.total}</p>
-                                    </div>
-                                    <FileText className="w-12 h-12 text-indigo-400 opacity-70" />
-                                </div>
-                            </div>
-                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm font-medium">KELUAR KANTOR</p>
-                                        <p className="text-4xl font-extrabold text-orange-600">{stats.keluar}</p>
-                                    </div>
-                                    <XCircle className="w-12 h-12 text-orange-400 opacity-70" />
-                                </div>
-                            </div>
-                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm font-medium">MASUK KANTOR</p>
-                                        <p className="text-4xl font-extrabold text-green-600">{stats.masuk}</p>
-                                    </div>
-                                    <CheckCircle className="w-12 h-12 text-green-400 opacity-70" />
-                                </div>
-                            </div>
-                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-gray-500 text-sm font-medium">TOTAL KARYAWAN</p>
-                                        <p className="text-4xl font-extrabold text-purple-600">{stats.unique}</p>
-                                    </div>
-                                    <Users className="w-12 h-12 text-purple-400 opacity-70" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Recent Absences */}
-                        <div className="bg-white rounded-xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold text-gray-800 mb-4">10 ABSENSI TERBARU</h2>
-                            <div className="space-y-4">
-                                {attendances.slice(0, 10).map((a) => (
-                                    <div key={a.id} className="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50 transition-colors rounded-md">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-3 h-3 rounded-full ${a.type === 'keluar' ? 'bg-orange-500' : 'bg-green-500'}`}></div>
-                                            <div>
-                                                <p className="font-semibold text-gray-800">{a.name}</p>
-                                                <p className="text-xs text-gray-500">{a.date} | {a.timestamp}</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className={`px-2 py-1 text-xs font-bold rounded-full ${a.type === 'keluar' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
-                                                {a.type.toUpperCase()}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                                {attendances.length === 0 && <p className="text-center text-gray-500 py-4">Belum ada data absensi.</p>}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Riwayat Tab (Admin & PKD) */}
-                {activeTab === 'riwayat' && (
-                    <div className="space-y-6">
-                        <div className="bg-white rounded-xl shadow-lg p-6">
-                            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-indigo-600"/> RIWAYAT ABSENSI</h2>
-                            
-                            <div className="flex flex-col md:flex-row gap-3 mb-6">
-                                <input 
-                                    type="date" 
-                                    value={filterDate} 
-                                    onChange={(e) => setFilterDate(e.target.value)} 
-                                    className="px-4 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 w-full md:w-auto"
-                                />
-                                <button onClick={exportToCSV} className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors shadow-md w-full md:w-auto" >
-                                    <Download className="w-5 h-5"/> EXPORT CSV
-                                </button>
-                            </div>
-
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-indigo-50">
-                                        <tr>
-                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">TANGGAL</th>
-                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">WAKTU</th>
-                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">NAMA</th>
-                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">TIPE</th>
-                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">KEPERLUAN</th>
-                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">LOKASI & FOTO</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-100">
-                                        {filteredAttendances.map((a) => (
-                                            <tr key={a.id} className="hover:bg-gray-50">
-                                                <td className="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{a.date}</td>
-                                                <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
-                                                    <span className="font-semibold">{a.customTime}</span> ({a.timestamp})
-                                                </td>
-                                                <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900 font-semibold">{a.name}</td>
-                                                <td className="px-3 py-3 whitespace-nowrap">
-                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${a.type === 'keluar' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
-                                                        {a.type.toUpperCase()}
-                                                    </span>
-                                                </td>
-                                                <td className="px-3 py-3 text-sm text-gray-500 max-w-xs truncate">{a.purpose}</td>
-                                                <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">
-                                                    <LocationDisplay locationData={a.location} />
-                                                    {a.photo && (
-                                                        <button 
-                                                            onClick={() => { setCurrentPhoto(a.photo); setShowPhotoModal(true); }}
-                                                            className="mt-1 ml-2 text-blue-500 hover:text-blue-700 text-xs font-medium flex items-center"
-                                                        >
-                                                            <UserCheck className="w-4 h-4 mr-1"/> Lihat Foto
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                        {filteredAttendances.length === 0 && (
-                                            <tr>
-                                                <td colSpan="6" className="px-3 py-5 text-center text-gray-500">Tidak ada data absensi untuk tanggal ini.</td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Pengaturan Tab (Admin Only) */}
-                {activeTab === 'pengaturan' && serverType === 'admin' && (
-                    <div className="space-y-8">
-                        
-                        {/* 1. Pengaturan Karyawan */}
-                        <div className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-indigo-500">
-                            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><Users className="w-5 h-5 text-indigo-600"/> MANAJEMEN KARYAWAN</h2>
-                            
-                            {/* Tambah Karyawan */}
-                            <button onClick={() => setShowAddEmployee(!showAddEmployee)} className="mb-4 flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-md text-sm" >
-                                <UserPlus className="w-5 h-5"/> TAMBAH KARYAWAN
-                            </button>
-
-                            {showAddEmployee && (
-                                <div className="p-4 bg-indigo-50 rounded-lg mb-4 flex gap-2">
-                                    <input 
-                                        type="text" 
-                                        value={newEmployeeName} 
-                                        onChange={(e) => setNewEmployeeName(e.target.value)} 
-                                        className="flex-grow px-4 py-2 border rounded-lg uppercase" 
-                                        placeholder="Nama Karyawan Baru"
-                                    />
-                                    <button onClick={handleAddEmployee} className="px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700">SIMPAN</button>
-                                </div>
-                            )}
-
-                            {/* Daftar Karyawan */}
-                            <div className="max-h-80 overflow-y-auto border p-3 rounded-lg bg-gray-50">
-                                <p className="text-sm font-bold text-gray-700 mb-2">DAFTAR ({employeeList.length} orang)</p>
-                                <ul className="space-y-1">
-                                    {employeeList.map((name) => (
-                                        <li key={name} className="flex justify-between items-center p-2 bg-white border rounded-md shadow-sm">
-                                            <span className="font-medium text-gray-800">{name}</span>
-                                            <button onClick={() => handleRemoveEmployee(name)} className="text-red-500 hover:text-red-700 transition-colors" title="Hapus Karyawan">
-                                                <Trash2 className="w-5 h-5"/>
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-
-                        {/* 2. Pengaturan Password Server */}
-                        <div className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-red-500">
-                            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><Key className="w-5 h-5 text-red-600"/> UBAH PASSWORD SERVER</h2>
-                            
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">PILIH AKUN</label>
-                                    <select 
-                                        value={passwordUserToChange} 
-                                        onChange={(e) => setPasswordUserToChange(e.target.value)} 
-                                        className="px-4 py-2 border rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500 w-full md:w-1/2"
-                                    >
-                                        <option value="admin">ADMIN</option>
-                                        <option value="pkd">PKD</option>
-                                    </select>
-                                </div>
-                                
-                                <button onClick={() => setShowPasswordChange(!showPasswordChange)} className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors shadow-md text-sm" >
-                                    UBAH PASSWORD {passwordUserToChange.toUpperCase()}
-                                </button>
-                                
-                                {showPasswordChange && (
-                                    <div className="p-4 bg-red-50 rounded-lg flex flex-col gap-3">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">PASSWORD BARU</label>
-                                            <input 
-                                                type="password" 
-                                                value={newPassword} 
-                                                onChange={(e) => setNewPassword(e.target.value)} 
-                                                className="w-full px-4 py-2 border rounded-lg" 
-                                                placeholder="Masukkan password baru (min. 6 karakter)"
-                                            />
-                                        </div>
-                                        <button onClick={handlePasswordChange} className="px-4 py-2 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800">KONFIRMASI PERUBAHAN</button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
-
-export default AttendanceSystem;
+                                        <p className="text-4xl font-extrabold text-indigo-900
