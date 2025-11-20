@@ -462,4 +462,342 @@ const AttendanceSystem = () => {
               <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  <span>{currentTime.toLocaleDateString('id-ID'
+                  <span>{currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase()}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  <span className="font-mono">{currentTime.toLocaleTimeString('id-ID')}</span>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setView('employee');
+                setIsServerAuth(false);
+                setServerPassword('');
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              LOGOUT
+            </button>
+          </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="bg-white rounded-lg shadow-lg mb-6 overflow-hidden">
+          <div className="flex flex-wrap border-b">
+            {serverType === 'admin' && (
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`flex items-center gap-2 px-4 md:px-6 py-4 font-medium transition-colors ${
+                  activeTab === 'dashboard'
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Users className="w-5 h-5" />
+                DASHBOARD
+              </button>
+            )}
+            <button
+              onClick={() => setActiveTab('riwayat')}
+              className={`flex items-center gap-2 px-4 md:px-6 py-4 font-medium transition-colors ${
+                activeTab === 'riwayat'
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <FileText className="w-5 h-5" />
+              RIWAYAT
+            </button>
+            {serverType === 'admin' && (
+              <button
+                onClick={() => setActiveTab('pengaturan')}
+                className={`flex items-center gap-2 px-4 md:px-6 py-4 font-medium transition-colors ${
+                  activeTab === 'pengaturan'
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Key className="w-5 h-5" />
+                PENGATURAN
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Dashboard Tab */}
+        {activeTab === 'dashboard' && serverType === 'admin' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-500 text-sm">TOTAL ABSENSI</p>
+                    <p className="text-3xl font-bold text-indigo-900">{stats.total}</p>
+                  </div>
+                  <FileText className="w-12 h-12 text-indigo-600" />
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-500 text-sm">KELUAR KANTOR</p>
+                    <p className="text-3xl font-bold text-orange-600">{stats.keluar}</p>
+                  </div>
+                  <XCircle className="w-12 h-12 text-orange-600" />
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-500 text-sm">MASUK KANTOR</p>
+                    <p className="text-3xl font-bold text-green-600">{stats.masuk}</p>
+                  </div>
+                  <CheckCircle className="w-12 h-12 text-green-600" />
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-500 text-sm">KARYAWAN</p>
+                    <p className="text-3xl font-bold text-purple-600">{stats.unique}</p>
+                  </div>
+                  <Users className="w-12 h-12 text-purple-600" />
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Attendance */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">ABSENSI TERBARU</h3>
+              <div className="space-y-3">
+                {attendances.slice(0, 5).map((attendance) => (
+                  <div key={attendance.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                    {attendance.photo && (
+                      <img src={attendance.photo} alt={attendance.name} className="w-16 h-16 rounded-full object-cover" />
+                    )}
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-800">{attendance.name}</p>
+                      <p className="text-sm text-gray-500">{attendance.date} {attendance.timestamp}</p>
+                      {attendance.purpose && attendance.purpose !== '-' && (
+                        <p className="text-xs text-gray-600 mt-1">KEPERLUAN: {attendance.purpose}</p>
+                      )}
+                    </div>
+                    <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                      attendance.type === 'masuk' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-orange-100 text-orange-800'
+                    }`}>
+                      {attendance.type === 'masuk' ? 'MASUK' : 'KELUAR'} - {attendance.customTime}
+                    </span>
+                  </div>
+                ))}
+                {attendances.length === 0 && (
+                  <p className="text-center text-gray-500 py-8">BELUM ADA DATA ABSENSI</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Riwayat Tab */}
+        {activeTab === 'riwayat' && (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">RIWAYAT ABSENSI</h2>
+              <button
+                onClick={exportToCSV}
+                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                EXPORT CSV
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">FILTER TANGGAL</label>
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">FOTO</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">NAMA</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">TIPE</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">WAKTU</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">TANGGAL</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">KEPERLUAN</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">LOKASI</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredAttendances.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
+                        BELUM ADA DATA ABSENSI
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredAttendances.map((attendance) => (
+                      <tr key={attendance.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3">
+                          {attendance.photo && (
+                            <img src={attendance.photo} alt={attendance.name} className="w-12 h-12 rounded-full object-cover" />
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-sm font-medium">{attendance.name}</td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            attendance.type === 'masuk' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-orange-100 text-orange-800'
+                          }`}>
+                            {attendance.type === 'masuk' ? 'MASUK' : 'KELUAR'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm">{attendance.customTime}</td>
+                        <td className="px-4 py-3 text-sm">{attendance.date} {attendance.timestamp}</td>
+                        <td className="px-4 py-3 text-sm">{attendance.purpose || '-'}</td>
+                        <td className="px-4 py-3 text-sm text-gray-500">{attendance.location}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Pengaturan Tab */}
+        {activeTab === 'pengaturan' && serverType === 'admin' && (
+          <div className="space-y-6">
+            {/* Change Password */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">UBAH PASSWORD</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">PASSWORD SAAT INI</label>
+                  <p className="text-sm text-gray-500">PASSWORD ADMIN: ••••••</p>
+                  <p className="text-sm text-gray-500">PASSWORD PKD: ••••••</p>
+                </div>
+                {!showPasswordChange ? (
+                  <button
+                    onClick={() => setShowPasswordChange(true)}
+                    className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    <Key className="w-4 h-4" />
+                    UBAH PASSWORD {serverType.toUpperCase()}
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">PASSWORD BARU (MIN 6 KARAKTER)</label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        placeholder="MASUKKAN PASSWORD BARU"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handlePasswordChange}
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        SIMPAN
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowPasswordChange(false);
+                          setNewPassword('');
+                        }}
+                        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                      >
+                        BATAL
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Add Employee */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">KELOLA KARYAWAN</h3>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-600 mb-2">TOTAL KARYAWAN: {employeeList.length} ORANG</p>
+                </div>
+                {!showAddEmployee ? (
+                  <button
+                    onClick={() => setShowAddEmployee(true)}
+                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    TAMBAH KARYAWAN BARU
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">NAMA KARYAWAN BARU</label>
+                      <input
+                        type="text"
+                        value={newEmployeeName}
+                        onChange={(e) => setNewEmployeeName(e.target.value.toUpperCase())}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+                        placeholder="MASUKKAN NAMA LENGKAP"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleAddEmployee}
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        SIMPAN
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowAddEmployee(false);
+                          setNewEmployeeName('');
+                        }}
+                        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                      >
+                        BATAL
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Employee List */}
+              <div className="mt-6">
+                <h4 className="font-medium text-gray-700 mb-3">DAFTAR KARYAWAN:</h4>
+                <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-4">
+                    {employeeList.map((name, index) => (
+                      <div key={name} className="flex items-center gap-2 text-sm text-gray-700 bg-gray-50 px-3 py-2 rounded">
+                        <span className="font-medium text-gray-500">{index + 1}.</span>
+                        <span>{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AttendanceSystem;
