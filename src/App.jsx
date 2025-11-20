@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, Users, CheckCircle, XCircle, FileText, Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2 } from 'lucide-react';
+// Pastikan Anda telah menginstal 'lucide-react' (npm install lucide-react)
+import { 
+    Calendar, Clock, MapPin, Users, CheckCircle, XCircle, FileText, 
+    Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2 
+} from 'lucide-react';
 
-// Fungsi untuk membuat URL Google Maps dari koordinat
+// Fungsi bantuan untuk membuat URL Google Maps
 const createMapLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
 const AttendanceSystem = () => {
+    // --- State Management ---
     const [currentTime, setCurrentTime] = useState(new Date());
     const [attendances, setAttendances] = useState([]);
     const [view, setView] = useState('employee');
@@ -19,31 +24,34 @@ const AttendanceSystem = () => {
     const [photoPreview, setPhotoPreview] = useState(null);
     const [attendanceMode, setAttendanceMode] = useState('keluar'); 
     
-    // Daftar karyawan (diambil dari data sebelumnya)
+    // Data Karyawan Awal (Dapat Diubah melalui Pengaturan)
     const [employeeList, setEmployeeList] = useState([
         'AGUNG TRI WARDANI', 'AHMAD SYAIFUL', 'AJI KURNIA RAMADHAN', 'ANAS FAUZI', 'ANAZYAH ZUROH', 'ANDI R FASHA JUANDI', 'ANTORO', 'ARI PURNOMO', 'ARIE SUPRIYANTO', 'ARIEF SUPRIYONO', 'ARIF WAHYUDI', 'ASA FATHIKHLAASH', 'AYI', 'AYOM WAHYU N', 'DESI APRILIENI', 'DEWI SARTIKA', 'DIMAS AR RASYID', 'DODY APRIYANA', 'ENDAY', 'GUSTAMININGSIH', 'HADI', 'HADI PURNOMO', 'HASANUDIN', 'HAYADI', 'HENDIYANA', 'INDRI SUSANTI', 'INRA EFFENDI ASRI', 'IRMA HARTINI', 'JOKO SUKENDRO', 'KHAIRUDDIN', 'LILI TOLANI', 'M ZAINAL RIZKI', 'MAMIK WIYANTO', 'MUHAMAD ALFAZRI', 'MUHAMMAD ALFINAS', 'MUHLISIN', 'NOPI HARYANTI', 'PRIYANTO', 'REVAN SAPUTRA', 'RUKMAN HAKIM', 'SAEPUDIN', 'SAHRONI', 'SANDI ALJABAR', 'SONY DARMAWAN', 'SUANDA', 'SUKASAH', 'SUPRIYANTO', 'SUWARNO', 'SUYARTO', 'TARMAN', 'TARJONO', 'TOYA SAMODRA', 'ULUT SURYANA', 'UYUM JUMHANA', 'WACA WIJAYA', 'WAHYUDIN', 'WAODE INDAH FARIDA', 'WARMIN', 'YAYAN HARYANTO', 'YATNO WIDIYATNO'
     ].sort());
     
-    // Passwords untuk Admin dan PKD
+    // Password untuk Login Server
     const [passwords, setPasswords] = useState({ admin: 'admin123', pkd: 'pkd123' });
     
-    // State UI untuk Pengaturan
+    // State untuk Pengaturan
     const [showPasswordChange, setShowPasswordChange] = useState(false);
     const [newPassword, setNewPassword] = useState('');
-    const [passwordUserToChange, setPasswordUserToChange] = useState('admin'); // 'admin' atau 'pkd'
+    const [passwordUserToChange, setPasswordUserToChange] = useState('admin');
     const [showAddEmployee, setShowAddEmployee] = useState(false);
     const [newEmployeeName, setNewEmployeeName] = useState('');
 
-    // State UI untuk Riwayat
+    // State untuk Riwayat
     const [showPhotoModal, setShowPhotoModal] = useState(false);
     const [currentPhoto, setCurrentPhoto] = useState(null);
 
     // --- EFFECT HOOKS ---
+    
+    // 1. Update Waktu Setiap Detik
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
+    // 2. Ambil Lokasi GPS Awal
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -51,7 +59,7 @@ const AttendanceSystem = () => {
                     setLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
                 },
                 () => {
-                    // Jika gagal atau ditolak, set lokasi ke koordinat default (contoh: Monas, Jakarta)
+                    // Fallback jika GPS gagal atau ditolak (contoh koordinat Jakarta)
                     setLocation({ lat: -6.1751, lng: 106.8650, failed: true });
                 }
             );
@@ -140,13 +148,12 @@ const AttendanceSystem = () => {
         const newAttendance = {
             id: Date.now(),
             name: employeeName,
-            position: 'ANGGOTA',
+            position: 'ANGGOTA', // Fixed Position
             type: type,
             customTime: customTime,
             purpose: purpose,
             date: currentTime.toLocaleDateString('id-ID'),
             timestamp: currentTime.toLocaleTimeString('id-ID'),
-            // Simpan koordinat mentah untuk tautan Maps
             location: location.failed ? 'LOKASI TIDAK TERSEDIA' : `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`, 
             photo: photoPreview,
             fullTimestamp: currentTime.toISOString()
@@ -159,6 +166,7 @@ const AttendanceSystem = () => {
         return true;
     };
 
+    // Absen Masuk Cepat
     const handleQuickAttendance = (employeeName) => {
         const currentTimeStr = currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
         if (createAttendanceRecord(employeeName, 'masuk', currentTimeStr)) {
@@ -166,6 +174,7 @@ const AttendanceSystem = () => {
         }
     };
 
+    // Submit Absen Keluar
     const handleSubmitKeluar = () => {
         if (!formData.name || !formData.customTime || !formData.purpose) {
             alert('SEMUA KOLOM WAJIB DIISI!');
@@ -190,8 +199,9 @@ const AttendanceSystem = () => {
 
     const exportToCSV = () => {
         const headers = ['TANGGAL', 'WAKTU INPUT', 'NAMA', 'TIPE', 'WAKTU', 'KEPERLUAN', 'LOKASI (Lat, Lng)'];
+        // Menggunakan ; sebagai delimiter untuk kompatibilitas Excel Indonesia
         const rows = filteredAttendances.map(a => [a.date, a.timestamp, a.name, a.type.toUpperCase(), a.customTime, a.purpose || '-', a.location.replace(/,/g, '')] );
-        const csv = [headers, ...rows].map(row => row.join(';')).join('\n'); // Menggunakan titik koma (;) sebagai delimiter
+        const csv = [headers, ...rows].map(row => row.join(';')).join('\n'); 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -241,12 +251,11 @@ const AttendanceSystem = () => {
         return (
             <div className="min-h-screen bg-gray-50 p-4 font-sans">
                 <div className="max-w-2xl mx-auto">
-                    {/* Header Utama - TANPA LOGO */}
+                    {/* Header Utama - TANPA LOGO UNTUK MENGHINDARI ERROR VERCEL */}
                     <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
                         <div className="flex justify-between items-start">
                             <div>
-                                {/* Hapus atau komentar baris <img src="..." /> di sini */}
-                                {/* <img src="/logo-bea-cukai.png" alt="Logo Bea Cukai" className="h-12 w-auto mb-2" /> */}
+                                {/* LOGO DIHILANGKAN DARI SINI */}
                                 
                                 <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-1 leading-tight">ABSENSI IZIN KELUAR MASUK PPNPN</h1>
                                 <p className="text-xs text-gray-500 font-semibold">MITRA KPU BEA DAN CUKAI TANJUNG PRIOK TIPE A</p>
@@ -267,7 +276,7 @@ const AttendanceSystem = () => {
                         </div>
                     </div>
 
-                    {/* Login Server (Tidak Berubah) */}
+                    {/* Login Server */}
                     {view === 'server' && !isServerAuth ? (
                         <div className="bg-white rounded-xl shadow-2xl p-8 border border-gray-200">
                             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2"><Lock className="w-6 h-6 text-indigo-600"/> LOGIN SERVER</h2>
@@ -298,7 +307,6 @@ const AttendanceSystem = () => {
                             {/* Mode Switch & Lokasi */}
                             <div className="bg-white rounded-xl shadow-lg p-4 flex flex-col md:flex-row justify-between items-center gap-4 border border-gray-100">
                                 <div className="flex gap-3 w-full md:w-auto">
-                                    {/* POSISI DITUKAR: KELUAR (KIRI) */}
                                     <button 
                                         onClick={() => setAttendanceMode('keluar')} 
                                         className={`flex-1 py-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 text-sm ${
@@ -307,7 +315,6 @@ const AttendanceSystem = () => {
                                     >
                                         <LogOut className="w-5 h-5" /> ABSENSI KELUAR 
                                     </button>
-                                    {/* POSISI DITUKAR: MASUK (KANAN) */}
                                     <button 
                                         onClick={() => setAttendanceMode('masuk')} 
                                         className={`flex-1 py-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 text-sm ${
@@ -337,7 +344,7 @@ const AttendanceSystem = () => {
                                 </div>
                             </div>
 
-                            {/* Absensi Keluar Mode (Dipindahkan ke Tampilan Pertama) */}
+                            {/* Absensi Keluar Mode */}
                             {attendanceMode === 'keluar' ? (
                                 <div className="bg-white rounded-xl shadow-2xl p-6 border-t-4 border-orange-600">
                                     <h2 className="text-2xl font-bold text-gray-800 mb-2">ABSENSI KELUAR 🟠</h2>
@@ -401,7 +408,7 @@ const AttendanceSystem = () => {
                                     </div>
                                 </div>
                             ) : (
-                                {/* Absen Masuk Mode (Dipindahkan ke Tampilan Kedua) */}
+                                {/* Absen Masuk Mode */}
                                 <div className="bg-white rounded-xl shadow-2xl p-6 border-t-4 border-green-600">
                                     <h2 className="text-2xl font-bold text-gray-800 mb-2">ABSEN MASUK 🟢</h2>
                                     <p className="text-gray-600 text-sm mb-6">Ambil foto selfie jelas, lalu tekan nama Anda.</p>
@@ -449,70 +456,278 @@ const AttendanceSystem = () => {
             );
         }
 
-        // Tampilan 2: Server (Admin & PKD) - Header Server
-        return (
-            <div className="min-h-screen bg-gray-50 p-4 font-sans">
-                <div className="max-w-7xl mx-auto">
-                    {/* Header Server */}
-                    <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-2">DASHBOARD SERVER {serverType.toUpperCase()}</h1>
-                                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm">
-                                    <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
-                                        <Calendar className="w-4 h-4 text-indigo-600" />
-                                        <span>{currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
-                                        <Clock className="w-4 h-4 text-indigo-600" />
-                                        <span className="font-mono text-lg font-bold">{currentTime.toLocaleTimeString('id-ID')}</span>
-                                    </div>
+    // Tampilan 2: Server (Admin & PKD)
+    return (
+        <div className="min-h-screen bg-gray-50 p-4 font-sans">
+            {showPhotoModal && <PhotoModal photoUrl={currentPhoto} onClose={() => setShowPhotoModal(false)} />}
+            <div className="max-w-7xl mx-auto">
+                
+                {/* Header Server */}
+                <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-2">DASHBOARD SERVER {serverType.toUpperCase()}</h1>
+                            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm">
+                                <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
+                                    <Calendar className="w-4 h-4 text-indigo-600" />
+                                    <span>{currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                </div>
+                                <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
+                                    <Clock className="w-4 h-4 text-indigo-600" />
+                                    <span className="font-mono text-lg font-bold">{currentTime.toLocaleTimeString('id-ID')}</span>
                                 </div>
                             </div>
-                            <button onClick={() => { setView('employee'); setIsServerAuth(false); setServerPassword(''); }} className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium shadow-md text-sm" >
-                                LOGOUT <LogOut className="w-4 h-4 inline ml-1"/>
-                            </button>
                         </div>
+                        <button onClick={() => { setView('employee'); setIsServerAuth(false); setServerPassword(''); }} className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium shadow-md text-sm" >
+                            LOGOUT <LogOut className="w-4 h-4 inline ml-1"/>
+                        </button>
                     </div>
+                </div>
 
-                    {/* Navigation Tabs (Tidak Berubah) */}
-                    <div className="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
-                        <div className="flex flex-wrap border-b border-gray-200">
-                            {serverType === 'admin' && (
-                                <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors border-r ${ activeTab === 'dashboard' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
-                                    <Users className="w-5 h-5" /> DASHBOARD
-                                </button>
-                            )}
-                            <button onClick={() => setActiveTab('riwayat')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors border-r ${ activeTab === 'riwayat' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
-                                <FileText className="w-5 h-5" /> RIWAYAT
+                {/* Navigation Tabs */}
+                <div className="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
+                    <div className="flex flex-wrap border-b border-gray-200">
+                        {serverType === 'admin' && (
+                            <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors border-r ${ activeTab === 'dashboard' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
+                                <Users className="w-5 h-5" /> DASHBOARD
                             </button>
-                            {serverType === 'admin' && (
-                                <button onClick={() => setActiveTab('pengaturan')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors ${ activeTab === 'pengaturan' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
-                                    <Key className="w-5 h-5" /> PENGATURAN
-                                </button>
-                            )}
-                        </div>
+                        )}
+                        <button onClick={() => setActiveTab('riwayat')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors border-r ${ activeTab === 'riwayat' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
+                            <FileText className="w-5 h-5" /> RIWAYAT
+                        </button>
+                        {serverType === 'admin' && (
+                            <button onClick={() => setActiveTab('pengaturan')} className={`flex items-center gap-2 px-4 md:px-6 py-4 font-bold transition-colors ${ activeTab === 'pengaturan' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-50' }`} >
+                                <Key className="w-5 h-5" /> PENGATURAN
+                            </button>
+                        )}
                     </div>
-                    
-                    {/* --- Konten Tab (Tidak Berubah) --- */}
+                </div>
+                
+                {/* --- Konten Tab --- */}
 
-                    {/* Dashboard Tab (Admin Only) */}
-                    {activeTab === 'dashboard' && serverType === 'admin' && (
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-gray-500 text-sm font-medium">TOTAL ABSENSI</p>
-                                            <p className="text-4xl font-extrabold text-indigo-900">{stats.total}</p>
-                                        </div>
-                                        <FileText className="w-12 h-12 text-indigo-400 opacity-70" />
+                {/* Dashboard Tab (Admin Only) */}
+                {activeTab === 'dashboard' && serverType === 'admin' && (
+                    <div className="space-y-6">
+                        {/* Summary Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium">TOTAL ABSENSI</p>
+                                        <p className="text-4xl font-extrabold text-indigo-900">{stats.total}</p>
                                     </div>
+                                    <FileText className="w-12 h-12 text-indigo-400 opacity-70" />
                                 </div>
-                                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-gray-500 text-sm font-medium">KELUAR KANTOR</p>
-                                            <p className="text-4xl font-extrabold text-orange-600">{stats.keluar}</p>
+                            </div>
+                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium">KELUAR KANTOR</p>
+                                        <p className="text-4xl font-extrabold text-orange-600">{stats.keluar}</p>
+                                    </div>
+                                    <XCircle className="w-12 h-12 text-orange-400 opacity-70" />
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium">MASUK KANTOR</p>
+                                        <p className="text-4xl font-extrabold text-green-600">{stats.masuk}</p>
+                                    </div>
+                                    <CheckCircle className="w-12 h-12 text-green-400 opacity-70" />
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium">TOTAL KARYAWAN</p>
+                                        <p className="text-4xl font-extrabold text-purple-600">{stats.unique}</p>
+                                    </div>
+                                    <Users className="w-12 h-12 text-purple-400 opacity-70" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Recent Absences */}
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h2 className="text-xl font-bold text-gray-800 mb-4">10 ABSENSI TERBARU</h2>
+                            <div className="space-y-4">
+                                {attendances.slice(0, 10).map((a) => (
+                                    <div key={a.id} className="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50 transition-colors rounded-md">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-3 h-3 rounded-full ${a.type === 'keluar' ? 'bg-orange-500' : 'bg-green-500'}`}></div>
+                                            <div>
+                                                <p className="font-semibold text-gray-800">{a.name}</p>
+                                                <p className="text-xs text-gray-500">{a.date} | {a.timestamp}</p>
+                                            </div>
                                         </div>
-                                        <XCircle className="w-1
+                                        <div className="text-right">
+                                            <span className={`px-2 py-1 text-xs font-bold rounded-full ${a.type === 'keluar' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
+                                                {a.type.toUpperCase()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                                {attendances.length === 0 && <p className="text-center text-gray-500 py-4">Belum ada data absensi.</p>}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Riwayat Tab (Admin & PKD) */}
+                {activeTab === 'riwayat' && (
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-xl shadow-lg p-6">
+                            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-indigo-600"/> RIWAYAT ABSENSI</h2>
+                            
+                            <div className="flex flex-col md:flex-row gap-3 mb-6">
+                                <input 
+                                    type="date" 
+                                    value={filterDate} 
+                                    onChange={(e) => setFilterDate(e.target.value)} 
+                                    className="px-4 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 w-full md:w-auto"
+                                />
+                                <button onClick={exportToCSV} className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors shadow-md w-full md:w-auto" >
+                                    <Download className="w-5 h-5"/> EXPORT CSV
+                                </button>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-indigo-50">
+                                        <tr>
+                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">TANGGAL</th>
+                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">WAKTU</th>
+                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">NAMA</th>
+                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">TIPE</th>
+                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">KEPERLUAN</th>
+                                            <th className="px-3 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">LOKASI & FOTO</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-100">
+                                        {filteredAttendances.map((a) => (
+                                            <tr key={a.id} className="hover:bg-gray-50">
+                                                <td className="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{a.date}</td>
+                                                <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
+                                                    <span className="font-semibold">{a.customTime}</span> ({a.timestamp})
+                                                </td>
+                                                <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900 font-semibold">{a.name}</td>
+                                                <td className="px-3 py-3 whitespace-nowrap">
+                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${a.type === 'keluar' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
+                                                        {a.type.toUpperCase()}
+                                                    </span>
+                                                </td>
+                                                <td className="px-3 py-3 text-sm text-gray-500 max-w-xs truncate">{a.purpose}</td>
+                                                <td className="px-3 py-3 whitespace-nowrap text-sm font-medium">
+                                                    <LocationDisplay locationData={a.location} />
+                                                    {a.photo && (
+                                                        <button 
+                                                            onClick={() => { setCurrentPhoto(a.photo); setShowPhotoModal(true); }}
+                                                            className="mt-1 ml-2 text-blue-500 hover:text-blue-700 text-xs font-medium flex items-center"
+                                                        >
+                                                            <UserCheck className="w-4 h-4 mr-1"/> Lihat Foto
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {filteredAttendances.length === 0 && (
+                                            <tr>
+                                                <td colSpan="6" className="px-3 py-5 text-center text-gray-500">Tidak ada data absensi untuk tanggal ini.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Pengaturan Tab (Admin Only) */}
+                {activeTab === 'pengaturan' && serverType === 'admin' && (
+                    <div className="space-y-8">
+                        
+                        {/* 1. Pengaturan Karyawan */}
+                        <div className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-indigo-500">
+                            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><Users className="w-5 h-5 text-indigo-600"/> MANAJEMEN KARYAWAN</h2>
+                            
+                            {/* Tambah Karyawan */}
+                            <button onClick={() => setShowAddEmployee(!showAddEmployee)} className="mb-4 flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-md text-sm" >
+                                <UserPlus className="w-5 h-5"/> TAMBAH KARYAWAN
+                            </button>
+
+                            {showAddEmployee && (
+                                <div className="p-4 bg-indigo-50 rounded-lg mb-4 flex gap-2">
+                                    <input 
+                                        type="text" 
+                                        value={newEmployeeName} 
+                                        onChange={(e) => setNewEmployeeName(e.target.value)} 
+                                        className="flex-grow px-4 py-2 border rounded-lg uppercase" 
+                                        placeholder="Nama Karyawan Baru"
+                                    />
+                                    <button onClick={handleAddEmployee} className="px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700">SIMPAN</button>
+                                </div>
+                            )}
+
+                            {/* Daftar Karyawan */}
+                            <div className="max-h-80 overflow-y-auto border p-3 rounded-lg bg-gray-50">
+                                <p className="text-sm font-bold text-gray-700 mb-2">DAFTAR ({employeeList.length} orang)</p>
+                                <ul className="space-y-1">
+                                    {employeeList.map((name) => (
+                                        <li key={name} className="flex justify-between items-center p-2 bg-white border rounded-md shadow-sm">
+                                            <span className="font-medium text-gray-800">{name}</span>
+                                            <button onClick={() => handleRemoveEmployee(name)} className="text-red-500 hover:text-red-700 transition-colors" title="Hapus Karyawan">
+                                                <Trash2 className="w-5 h-5"/>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* 2. Pengaturan Password Server */}
+                        <div className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-red-500">
+                            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><Key className="w-5 h-5 text-red-600"/> UBAH PASSWORD SERVER</h2>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">PILIH AKUN</label>
+                                    <select 
+                                        value={passwordUserToChange} 
+                                        onChange={(e) => setPasswordUserToChange(e.target.value)} 
+                                        className="px-4 py-2 border rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500 w-full md:w-1/2"
+                                    >
+                                        <option value="admin">ADMIN</option>
+                                        <option value="pkd">PKD</option>
+                                    </select>
+                                </div>
+                                
+                                <button onClick={() => setShowPasswordChange(!showPasswordChange)} className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors shadow-md text-sm" >
+                                    UBAH PASSWORD {passwordUserToChange.toUpperCase()}
+                                </button>
+                                
+                                {showPasswordChange && (
+                                    <div className="p-4 bg-red-50 rounded-lg flex flex-col gap-3">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">PASSWORD BARU</label>
+                                            <input 
+                                                type="password" 
+                                                value={newPassword} 
+                                                onChange={(e) => setNewPassword(e.target.value)} 
+                                                className="w-full px-4 py-2 border rounded-lg" 
+                                                placeholder="Masukkan password baru (min. 6 karakter)"
+                                            />
+                                        </div>
+                                        <button onClick={handlePasswordChange} className="px-4 py-2 bg-red-700 text-white rounded-lg font-bold hover:bg-red-800">KONFIRMASI PERUBAHAN</button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default AttendanceSystem;
