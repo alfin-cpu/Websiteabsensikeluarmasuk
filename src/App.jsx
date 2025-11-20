@@ -58,7 +58,6 @@ const AttendanceSystem = () => {
                     setLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
                 },
                 (error) => {
-                    // Fallback jika GPS gagal atau ditolak (contoh koordinat Jakarta)
                     console.error("Error getting geolocation:", error);
                     setLocation({ lat: -6.1751, lng: 106.8650, failed: true });
                 }
@@ -408,8 +407,7 @@ const AttendanceSystem = () => {
                                         </button>
                                     </div>
                                 </div>
-                            ) : (
-                                {/* Absen Masuk Mode */}
+                            ) : ( // Ini adalah bagian ELSE dari ternary operator.
                                 <div className="bg-white rounded-xl shadow-2xl p-6 border-t-4 border-green-600">
                                     <h2 className="text-2xl font-bold text-gray-800 mb-2">ABSEN MASUK 🟢</h2>
                                     <p className="text-gray-600 text-sm mb-6">Ambil foto selfie jelas, lalu tekan nama Anda.</p>
@@ -515,4 +513,12 @@ const AttendanceSystem = () => {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-gray-500 text-sm font-medium">TOTAL ABSENSI</p>
-                                        <p className="text-4xl font-extrabold text-indigo-900
+                                        <p className="text-4xl font-extrabold text-indigo-900">{stats.total}</p>
+                                    </div>
+                                    <FileText className="w-12 h-12 text-indigo-400 opacity-70" />
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-medium">KELUAR KANT
