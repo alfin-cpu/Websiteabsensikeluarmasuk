@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'; // Pastikan lucide-react sudah terinstal
 
 // Fungsi bantuan untuk membuat URL Google Maps dari koordinat
-const createMapLink = (lat, lng) => `https://www.google.com/maps?q=${lat},${lng}`;
+const createMapLink = (lat, lng) => `https://www.google.com/maps?q=${lat},${lng}`; // INI SUDAH DIPERBAIKI!
 
 const AttendanceSystem = () => {
     // --- State Management ---
@@ -468,40 +468,5 @@ const AttendanceSystem = () => {
                             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm">
                                 <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
                                     <Calendar className="w-4 h-4 text-indigo-600" />
-                                    <span>{currentTime.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                                </div>
-                                <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
-                                    <Clock className="w-4 h-4 text-indigo-600" />
-                                    <span className="font-mono text-lg font-bold">{currentTime.toLocaleTimeString('id-ID')}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <button onClick={() => { setView('employee'); setIsServerAuth(false); setServerPassword(''); }} className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium shadow-md text-sm" >
-                            LOGOUT <LogOut className="w-4 h-4 inline ml-1"/>
-                        </button>
-                    </div>
+                                    <span>{currentTime.toLocaleDateString
 
-                    {/* Tabs Navigation */}
-                    <div className="flex border-b border-gray-200">
-                        <button 
-                            onClick={() => setActiveTab('dashboard')}
-                            className={`px-6 py-3 text-sm font-semibold transition-all ${
-                                activeTab === 'dashboard' ? 'border-b-4 border-indigo-600 text-indigo-800' : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                            disabled={serverType === 'pkd'} // PKD tidak bisa akses dashboard
-                        >
-                            <Home className="w-4 h-4 inline mr-2"/> DASHBOARD
-                        </button>
-                        <button 
-                            onClick={() => setActiveTab('riwayat')}
-                            className={`px-6 py-3 text-sm font-semibold transition-all ${
-                                activeTab === 'riwayat' ? 'border-b-4 border-indigo-600 text-indigo-800' : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                        >
-                            <FileText className="w-4 h-4 inline mr-2"/> RIWAYAT ABSENSI
-                        </button>
-                        {serverType === 'admin' && ( // Hanya Admin yang bisa akses Pengaturan
-                            <button 
-                                onClick={() => setActiveTab('pengaturan')}
-                                className={`px-6 py-3 text-sm font-semibold transition-all ${
-                                    activeTab === 'pengaturan' ? 'border-
