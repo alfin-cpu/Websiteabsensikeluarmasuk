@@ -21,6 +21,9 @@
 
     <form name="submit-to-google-sheet">
         
+        <input type="hidden" name="TANGGAL" id="tanggalInput">
+        <input type="hidden" name="WAKTU" id="waktuInput"> 
+
         <label>Nama Lengkap</label>
         <input type="text" name="NAMA" required placeholder="Nama Anda...">
 
@@ -32,12 +35,12 @@
             <option value="Izin">Izin</option>
         </select>
 
-        <label>Keperluan</label>
+        <label>Keperluan (Hanya Diisi jika Izin/Dinas Luar)</label>
         <input type="text" name="KEPERLUAN" placeholder="Isi jika Izin/Dinas Luar">
 
         <label>Lokasi Saya</label>
         <button type="button" class="btn-lokasi" onclick="getLocation()">📍 Ambil Lokasi Saya Otomatis</button>
-        <textarea name="LOKASI" id="lokasiInput" required placeholder="Klik tombol biru di atas..."></textarea>
+        <textarea name="LOKASI" id="lokasiInput" required placeholder="Klik tombol biru di atas untuk mendapatkan lokasi..."></textarea>
 
         <button type="submit">KIRIM ABSENSI</button>
     </form>
@@ -45,15 +48,47 @@
     <p id="pesan"></p>
 
     <script>
-      // PASTE URL SCRIPT ANDA DI SINI:
       const scriptURL = 'TEMPEL_URL_PANJANG_GOOGLE_APPS_SCRIPT_DISINI'
       
       const form = document.forms['submit-to-google-sheet']
       const pesan = document.getElementById('pesan')
+      const lokasiInput = document.getElementById('lokasiInput')
+      const tanggalInput = document.getElementById('tanggalInput')
+      const waktuInput = document.getElementById('waktuInput')
+
+      /**
+       * Fungsi untuk mengisi Tanggal dan Waktu saat ini.
+       * Dipanggil sesaat sebelum formulir dikirim.
+       */
+      function updateDateTimeFields() {
+          const now = new Date();
+          
+          // Format TANGGAL (Contoh: 21/11/2025)
+          const dateString = now.toLocaleDateString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit' }); 
+          
+          // Format WAKTU (Jam Spesifik/Waktu Input, Contoh: 21:01:30)
+          const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+          
+          tanggalInput.value = dateString;
+          waktuInput.value = timeString;
+      }
+
 
       // Skrip Kirim Data
       form.addEventListener('submit', e => {
         e.preventDefault()
+        
+        // 1. OTOMASI TANGGAL DAN WAKTU
+        updateDateTimeFields();
+
+        // 2. VALIDASI LOKASI
+        if (lokasiInput.value.includes('Klik tombol') || lokasiInput.value.trim() === '') {
+            pesan.innerHTML = "❌ Lokasi belum diambil. Silakan klik tombol biru!";
+            pesan.style.color = "red";
+            return; // Hentikan proses pengiriman
+        }
+
+        // 3. PROSES PENGIRIMAN
         pesan.innerHTML = "⏳ Sedang mengirim data..."
         
         fetch(scriptURL, { method: 'POST', body: new FormData(form)})
@@ -71,11 +106,12 @@
 
       // Skrip Ambil Lokasi GPS (Fungsi yang dipanggil oleh tombol)
       function getLocation() {
+          lokasiInput.value = "Mencari lokasi, tunggu sebentar...";
           if (navigator.geolocation) {
               // Panggil showPosition jika sukses
               navigator.geolocation.getCurrentPosition(showPosition, showError);
           } else { 
-              document.getElementById('lokasiInput').value = "Geolocation tidak didukung oleh browser ini.";
+              lokasiInput.value = "Geolocation tidak didukung oleh browser ini.";
           }
       }
 
@@ -84,11 +120,11 @@
           const lat = position.coords.latitude;
           const long = position.coords.longitude;
 
-          // Buat Link Google Maps yang RAPI
-          const linkGoogleMaps = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
+          // Buat Link Google Maps
+          const linkGoogleMaps = `https://maps.google.com/?q=${lat},${long}`;
           
           // Masukkan link tersebut ke dalam kotak isian LOKASI
-          document.getElementById('lokasiInput').value = linkGoogleMaps;
+          lokasiInput.value = linkGoogleMaps;
       }
       
       function showError(error) {
@@ -107,7 +143,7 @@
                   pesanError = "Terjadi kesalahan yang tidak diketahui.";
                   break;
           }
-          document.getElementById('lokasiInput').value = `Gagal Ambil Lokasi: ${pesanError}`;
+          lokasiInput.value = `Gagal Ambil Lokasi: ${pesanError}`;
       }
     </script> 
 </body>
