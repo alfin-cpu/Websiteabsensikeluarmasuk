@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Calendar, Clock, MapPin, Users, CheckCircle, XCircle, FileText,
     Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2, Home, Settings, AlertCircle
-} from 'lucide-react'; // Pastikan lucide-react sudah terinstal
+} from 'lucide-react';
 
 // Fungsi bantuan untuk membuat URL Google Maps dari koordinat
 const createMapLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
@@ -509,6 +509,4 @@ const AttendanceSystem = () => {
                     <div className="flex justify-between items-start">
                         <div>
                             <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-2">DASHBOARD SERVER {serverType.toUpperCase()}</h1>
-                            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 text-sm">
-                                <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
-                                    <Calendar className="w-4 h-4 text-indigo-600" />
+                            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-60
