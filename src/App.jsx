@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'; // Pastikan lucide-react sudah terinstal
 
 // Fungsi bantuan untuk membuat URL Google Maps dari koordinat
-const createMapLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; // Sudah diperbaiki!
+const createMapLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; 
 
 const AttendanceSystem = () => {
     // --- State Management ---
@@ -239,7 +239,7 @@ const AttendanceSystem = () => {
                     </button>
                 </div>
                 <h3 className="text-xl font-bold mb-4 text-center">FOTO ABSENSI</h3>
-                <img src={photoUrl} alt="Foto Absensi Karyawan" className="w-full h-auto rounded-lg shadow-lg" />
+                <img src={photoUrl} alt="Foto Absensi Karyawan" className="w-full h-48 object-cover rounded-lg shadow-lg" />
             </div>
         </div>
     );
@@ -482,4 +482,23 @@ const AttendanceSystem = () => {
                     </div>
 
                     {/* Tabs Navigation */}
-                    
+                    <div className="flex bg-gray-200 rounded-xl p-2 gap-2 mt-6">
+                        <button 
+                            onClick={() => setActiveTab('dashboard')}
+                            className={`flex-1 px-6 py-3 text-sm font-semibold rounded-lg transition-all ${
+                                activeTab === 'dashboard' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-700 hover:bg-gray-300'
+                            } ${serverType === 'pkd' ? 'hidden' : ''}`} // Sembunyikan untuk PKD
+                        >
+                            <Users className="w-4 h-4 inline mr-2"/> DASHBOARD
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('riwayat')}
+                            className={`flex-1 px-6 py-3 text-sm font-semibold rounded-lg transition-all ${
+                                activeTab === 'riwayat' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-700 hover:bg-gray-300'
+                            }`}
+                        >
+                            <FileText className="w-4 h-4 inline mr-2"/> RIWAYAT ABSENSI
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('pengaturan')}
+                            className
