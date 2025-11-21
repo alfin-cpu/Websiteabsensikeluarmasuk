@@ -450,8 +450,8 @@ const AttendanceSystem = () => {
                                     </div>
                                 </div>
                             ) : (
-                                {/* Absen Masuk Mode */}
-                                <div className="bg-white rounded-xl shadow-2xl p-6 border-t-8 border-green-500">
+                                /* Absen Masuk Mode */
+                                <div className="bg-white rounded-xl shadow-2xl p-6 border-t-8 border-green-500"> {/* BARIS INI (454) DI LOG ANDA */}
                                     <h2 className="text-2xl font-extrabold text-gray-800 mb-2 flex items-center"><LogIn className='w-6 h-6 mr-2 text-green-500' /> ABSENSI MASUK</h2>
                                     <p className="text-gray-600 text-sm mb-6 border-b pb-2 border-dashed">Langkah Cepat: Ambil foto, lalu tekan nama Anda untuk absen.</p>
 
@@ -502,11 +502,4 @@ const AttendanceSystem = () => {
     return (
         <div className="min-h-screen bg-gray-100 p-4 font-sans antialiased">
             {showPhotoModal && <PhotoModal photoUrl={currentPhoto} onClose={() => setShowPhotoModal(false)} />}
-            <div className="max-w-7xl mx-auto">
-
-                {/* Header Server */}
-                <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-extrabold text-indigo-900 mb-2">DASHBOARD SERVER {serverType.toUpperCase()}</h1>
-                            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-60
+            <div className="max-w-7
