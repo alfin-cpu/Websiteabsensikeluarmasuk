@@ -69,16 +69,46 @@
           })
       })
 
-      // Skrip Ambil Lokasi GPS
-            function showPosition(position) {
-        // Ambil titik koordinat
-        const lat = position.coords.latitude;
-        const long = position.coords.longitude;
-
-        // Buat Link Google Maps yang RAPI
-        // Format: https://www.google.com/maps?q=LATITUDE,LONGITUDE
-        const linkGoogleMaps = "https://www.google.com/maps?q=" + lat + "," + long;
-        
-        // Masukkan link tersebut ke dalam kotak isian LOKASI
-        document.getElementById('lokasiInput').value = linkGoogleMaps;
+      // Skrip Ambil Lokasi GPS (Fungsi yang dipanggil oleh tombol)
+      function getLocation() {
+          if (navigator.geolocation) {
+              // Panggil showPosition jika sukses
+              navigator.geolocation.getCurrentPosition(showPosition, showError);
+          } else { 
+              document.getElementById('lokasiInput').value = "Geolocation tidak didukung oleh browser ini.";
+          }
       }
+
+      function showPosition(position) {
+          // Ambil titik koordinat
+          const lat = position.coords.latitude;
+          const long = position.coords.longitude;
+
+          // Buat Link Google Maps yang RAPI
+          const linkGoogleMaps = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
+          
+          // Masukkan link tersebut ke dalam kotak isian LOKASI
+          document.getElementById('lokasiInput').value = linkGoogleMaps;
+      }
+      
+      function showError(error) {
+          let pesanError = "";
+          switch(error.code) {
+              case error.PERMISSION_DENIED:
+                  pesanError = "Pengguna menolak permintaan Geolocation.";
+                  break;
+              case error.POSITION_UNAVAILABLE:
+                  pesanError = "Informasi lokasi tidak tersedia.";
+                  break;
+              case error.TIMEOUT:
+                  pesanError = "Waktu permintaan lokasi habis.";
+                  break;
+              case error.UNKNOWN_ERROR:
+                  pesanError = "Terjadi kesalahan yang tidak diketahui.";
+                  break;
+          }
+          document.getElementById('lokasiInput').value = `Gagal Ambil Lokasi: ${pesanError}`;
+      }
+    </script> 
+</body>
+</html>
