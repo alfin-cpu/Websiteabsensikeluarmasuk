@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 
 // Fungsi bantuan untuk membuat URL Google Maps dari koordinat
-const createMapLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+const createMapLink = (lat, lng) => `https://www.google.com/maps?q=${lat},${lng}`; // Perbaikan: URL Google Maps yang benar
 
 const AttendanceSystem = () => {
     // --- State Management ---
@@ -131,6 +131,15 @@ const AttendanceSystem = () => {
         }
     };
 
+    const handleServerLogout = () => { // Menambahkan fungsi logout
+        setIsServerAuth(false);
+        setServerType('');
+        setView('employee');
+        setServerPassword('');
+        setActiveTab('dashboard'); // Reset tab ke default
+    };
+
+
     const handlePasswordChange = () => {
         if (!newPassword || newPassword.length < 6) {
             alert('PASSWORD BARU HARUS MINIMAL 6 KARAKTER!');
@@ -164,6 +173,14 @@ const AttendanceSystem = () => {
             alert(`${nameToRemove} BERHASIL DIHAPUS.`);
         }
     };
+
+    const handleClearAllAttendances = () => {
+        if (window.confirm("ANDA YAKIN INGIN MENGHAPUS SEMUA DATA ABSENSI? TINDAKAN INI TIDAK BISA DIBATALKAN!")) {
+            setAttendances([]);
+            alert("SEMUA DATA ABSENSI BERHASIL DIHAPUS.");
+        }
+    };
+
 
     // --- FUNGSI ABSENSI ---
 
@@ -254,8 +271,9 @@ const AttendanceSystem = () => {
         a.click();
     };
 
-    // --- KOMPONEN BANTUAN UI ---
+    // --- KOMPONEN BANTUAN UI (Nested) ---
 
+    // Komponen LocationDisplay (tetap di dalam AttendanceSystem)
     const LocationDisplay = ({ locationData }) => {
         if (locationData && locationData.includes(',')) {
             const [lat, lng] = locationData.split(',').map(c => c.trim());
@@ -274,6 +292,7 @@ const AttendanceSystem = () => {
         return <span className="text-gray-500 text-xs">{locationData}</span>;
     };
 
+    // Komponen PhotoModal (tetap di dalam AttendanceSystem)
     const PhotoModal = ({ photoUrl, onClose }) => (
         <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4" onClick={onClose}>
             <div className="bg-white rounded-xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
@@ -283,7 +302,11 @@ const AttendanceSystem = () => {
                     </button>
                 </div>
                 <h3 className="text-xl font-bold mb-4 text-center">FOTO ABSENSI</h3>
-                <img src={photoUrl} alt="Foto Absensi Karyawan" className="w-full h-auto object-contain rounded-lg shadow-lg max-h-[70vh]" />
+                {photoUrl ? (
+                    <img src={photoUrl} alt="Foto Absensi Karyawan" className="w-full h-auto object-contain rounded-lg shadow-lg max-h-[70vh]" />
+                ) : (
+                    <p className="text-center text-gray-500">Tidak ada foto untuk ditampilkan.</p>
+                )}
             </div>
         </div>
     );
@@ -451,7 +474,7 @@ const AttendanceSystem = () => {
                                 </div>
                             ) : (
                                 /* Absen Masuk Mode */
-                                <div className="bg-white rounded-xl shadow-2xl p-6 border-t-8 border-green-500"> {/* BARIS INI (454) DI LOG ANDA */}
+                                <div className="bg-white rounded-xl shadow-2xl p-6 border-t-8 border-green-500">
                                     <h2 className="text-2xl font-extrabold text-gray-800 mb-2 flex items-center"><LogIn className='w-6 h-6 mr-2 text-green-500' /> ABSENSI MASUK</h2>
                                     <p className="text-gray-600 text-sm mb-6 border-b pb-2 border-dashed">Langkah Cepat: Ambil foto, lalu tekan nama Anda untuk absen.</p>
 
@@ -502,4 +525,12 @@ const AttendanceSystem = () => {
     return (
         <div className="min-h-screen bg-gray-100 p-4 font-sans antialiased">
             {showPhotoModal && <PhotoModal photoUrl={currentPhoto} onClose={() => setShowPhotoModal(false)} />}
-            <div className="max-w-7
+            <div className="max-w-7xl mx-auto"> {/* Ini adalah bagian yang terpotong dan kini diperbaiki */}
+
+                {/* Header Server */}
+                <div className="bg-white rounded-3xl shadow-xl p-6 mb-6 border-t-8 border-indigo-600/70 backdrop-blur-sm flex justify-between items-center">
+                    <div>
+                        <h1 className="text-3xl font-extrabold text-indigo-800 mb-1 leading-tight">DASHBOARD SERVER</h1>
+                        <p className="text-sm text-gray-500 font-semibold">STATUS: <span className={`font-bold ${serverType === 'admin' ? 'text-red-600' : 'text-green-600'}`}>{serverType.toUpperCase()}</span></p>
+                    </div>
+                    <button onClick={handleServerLogout}
