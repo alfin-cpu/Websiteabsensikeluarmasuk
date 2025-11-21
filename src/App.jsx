@@ -1,25 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Calendar, Clock, MapPin, Users, CheckCircle, XCircle, FileText,
-    Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2, Home, Settings, AlertCircle
+import { 
+    Calendar, Clock, MapPin, Users, CheckCircle, XCircle, FileText, 
+    Download, Lock, UserCheck, LogIn, LogOut, UserPlus, Key, Trash2, Home, Settings 
 } from 'lucide-react'; // Pastikan lucide-react sudah terinstal
 
 // Fungsi bantuan untuk membuat URL Google Maps dari koordinat
-const createMapLink = (lat, lng) => `http://maps.google.com/maps?q=${lat},${lng}`;
+const createMapLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; 
 
 const AttendanceSystem = () => {
     // --- State Management ---
     const [currentTime, setCurrentTime] = useState(new Date());
-    const [attendances, setAttendances] = useState(() => {
-        // Coba muat dari localStorage saat inisialisasi
-        try {
-            const savedAttendances = localStorage.getItem('attendances');
-            return savedAttendances ? JSON.parse(savedAttendances) : [];
-        } catch (error) {
-            console.error("Failed to parse attendances from localStorage", error);
-            return [];
-        }
-    });
+    const [attendances, setAttendances] = useState([]);
     const [view, setView] = useState('employee'); // 'employee' atau 'server'
     const [serverPassword, setServerPassword] = useState('');
     const [isServerAuth, setIsServerAuth] = useState(false);
@@ -31,37 +22,15 @@ const AttendanceSystem = () => {
     const [photo, setPhoto] = useState(null); // File object
     const [photoPreview, setPhotoPreview] = useState(null); // Data URL for preview
     const [attendanceMode, setAttendanceMode] = useState('keluar'); // 'keluar' atau 'masuk'
-
+    
     // Data Karyawan Awal (Dapat Diubah melalui Pengaturan Admin)
-    const [employeeList, setEmployeeList] = useState(() => {
-        try {
-            const savedEmployees = localStorage.getItem('employeeList');
-            if (savedEmployees) {
-                return JSON.parse(savedEmployees).sort();
-            }
-            // Default list jika tidak ada di localStorage
-            const defaultList = [
-                'AGUNG TRI WARDANI', 'AHMAD SYAIFUL', 'AJI KURNIA RAMADHAN', 'ANAS FAUZI', 'ANAZYAH ZUROH', 'ANDI R FASHA JUANDI', 'ANTORO', 'ARI PURNOMO', 'ARIE SUPRIYANTO', 'ARIEF SUPRIYONO', 'ARIF WAHYUDI', 'ASA FATHIKHLAASH', 'AYI', 'AYOM WAHYU N', 'DESI APRILIENI', 'DEWI SARTIKA', 'DIMAS AR RASYID', 'DODY APRIYANA', 'ENDAY', 'GUSTAMININGSIH', 'HADI', 'HADI PURNOMO', 'HASANUDIN', 'HAYADI', 'HENDIYANA', 'INDRI SUSANTI', 'INRA EFFENDI ASRI', 'IRMA HARTINI', 'JOKO SUKENDRO', 'KHAIRUDDIN', 'LILI TOLANI', 'M ZAINAL RIZKI', 'MAMIK WIYANTO', 'MUHAMAD ALFAZRI', 'MUHAMMAD ALFINAS', 'MUHLISIN', 'NOPI HARYANTI', 'PRIYANTO', 'REVAN SAPUTRA', 'RUKMAN HAKIM', 'SAEPUDIN', 'SAHRONI', 'SANDI ALJABAR', 'SONY DARMAWAN', 'SUANDA', 'SUKASAH', 'SUPRIYANTO', 'SUWARNO', 'SUYARTO', 'TARMAN', 'TARJONO', 'TOYA SAMODRA', 'ULUT SURYANA', 'UYUM JUMHANA', 'WACA WIJAYA', 'WAHYUDIN', 'WAODE INDAH FARIDA', 'WARMIN', 'YAYAN HARYANTO', 'YATNO WIDIYATNO'
-            ].sort();
-            // localStorage.setItem('employeeList', JSON.stringify(defaultList)); // Simpan default ke localStorage jika tidak ada
-            return defaultList;
-        } catch (error) {
-            console.error("Failed to parse employeeList from localStorage", error);
-            return [];
-        }
-    });
-
+    const [employeeList, setEmployeeList] = useState([
+        'AGUNG TRI WARDANI', 'AHMAD SYAIFUL', 'AJI KURNIA RAMADHAN', 'ANAS FAUZI', 'ANAZYAH ZUROH', 'ANDI R FASHA JUANDI', 'ANTORO', 'ARI PURNOMO', 'ARIE SUPRIYANTO', 'ARIEF SUPRIYONO', 'ARIF WAHYUDI', 'ASA FATHIKHLAASH', 'AYI', 'AYOM WAHYU N', 'DESI APRILIENI', 'DEWI SARTIKA', 'DIMAS AR RASYID', 'DODY APRIYANA', 'ENDAY', 'GUSTAMININGSIH', 'HADI', 'HADI PURNOMO', 'HASANUDIN', 'HAYADI', 'HENDIYANA', 'INDRI SUSANTI', 'INRA EFFENDI ASRI', 'IRMA HARTINI', 'JOKO SUKENDRO', 'KHAIRUDDIN', 'LILI TOLANI', 'M ZAINAL RIZKI', 'MAMIK WIYANTO', 'MUHAMAD ALFAZRI', 'MUHAMMAD ALFINAS', 'MUHLISIN', 'NOPI HARYANTI', 'PRIYANTO', 'REVAN SAPUTRA', 'RUKMAN HAKIM', 'SAEPUDIN', 'SAHRONI', 'SANDI ALJABAR', 'SONY DARMAWAN', 'SUANDA', 'SUKASAH', 'SUPRIYANTO', 'SUWARNO', 'SUYARTO', 'TARMAN', 'TARJONO', 'TOYA SAMODRA', 'ULUT SURYANA', 'UYUM JUMHANA', 'WACA WIJAYA', 'WAHYUDIN', 'WAODE INDAH FARIDA', 'WARMIN', 'YAYAN HARYANTO', 'YATNO WIDIYATNO'
+    ].sort());
+    
     // Password untuk Login Server (sesuaikan jika perlu)
-    const [passwords, setPasswords] = useState(() => {
-        try {
-            const savedPasswords = localStorage.getItem('passwords');
-            return savedPasswords ? JSON.parse(savedPasswords) : { admin: 'admin123', pkd: 'pkd123' };
-        } catch (error) {
-            console.error("Failed to parse passwords from localStorage", error);
-            return { admin: 'admin123', pkd: 'pkd123' };
-        }
-    });
-
+    const [passwords, setPasswords] = useState({ admin: 'admin123', pkd: 'pkd123' });
+    
     // State untuk Pengaturan
     const [showPasswordChange, setShowPasswordChange] = useState(false);
     const [newPassword, setNewPassword] = useState('');
@@ -74,30 +43,14 @@ const AttendanceSystem = () => {
     const [currentPhoto, setCurrentPhoto] = useState(null);
 
     // --- EFFECT HOOKS ---
-
+    
     // 1. Update Waktu Setiap Detik
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
-    // 2. Simpan Attendances ke LocalStorage setiap kali berubah
-    useEffect(() => {
-        localStorage.setItem('attendances', JSON.stringify(attendances));
-    }, [attendances]);
-
-    // 3. Simpan EmployeeList ke LocalStorage setiap kali berubah
-    useEffect(() => {
-        localStorage.setItem('employeeList', JSON.stringify(employeeList));
-    }, [employeeList]);
-
-    // 4. Simpan Passwords ke LocalStorage setiap kali berubah
-    useEffect(() => {
-        localStorage.setItem('passwords', JSON.stringify(passwords));
-    }, [passwords]);
-
-
-    // 5. Ambil Lokasi GPS Awal
+    // 2. Ambil Lokasi GPS Awal
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -107,13 +60,12 @@ const AttendanceSystem = () => {
                 (error) => {
                     console.error("Error getting geolocation:", error);
                     // Koordinat default jika gagal, misal KPU Tanjung Priok
-                    setLocation({ lat: -6.1030, lng: 106.8837, failed: true });
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // Opsi akurasi tinggi
+                    setLocation({ lat: -6.1030, lng: 106.8837, failed: true }); 
+                }
             );
         } else {
-            console.warn("Geolocation not supported by this browser.");
-            setLocation({ lat: -6.1030, lng: 106.8837, failed: true });
+             console.warn("Geolocation not supported by this browser.");
+             setLocation({ lat: -6.1030, lng: 106.8837, failed: true });
         }
     }, []);
 
@@ -190,10 +142,10 @@ const AttendanceSystem = () => {
         }
 
         if (!location) {
-            alert('LOKASI GPS BELUM TERDETEKSI. COBA LAGI.');
-            return false;
+             alert('LOKASI GPS BELUM TERDETEKSI. COBA LAGI.');
+             return false;
         }
-
+        
         const newAttendance = {
             id: Date.now(),
             name: employeeName,
@@ -203,12 +155,12 @@ const AttendanceSystem = () => {
             purpose: purpose,
             date: currentTime.toLocaleDateString('id-ID'),
             timestamp: currentTime.toLocaleTimeString('id-ID'),
-            location: location.failed ? 'LOKASI TIDAK TERSEDIA' : `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`,
+            location: location.failed ? 'LOKASI TIDAK TERSEDIA' : `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`, 
             photo: photoPreview,
             fullTimestamp: currentTime.toISOString() // Untuk sorting
         };
 
-        setAttendances([newAttendance, ...attendances]); // Tambahkan yang baru di depan
+        setAttendances([newAttendance, ...attendances]);
         setFormData({ name: '', purpose: '', customTime: '' });
         setPhoto(null);
         setPhotoPreview(null);
@@ -230,18 +182,14 @@ const AttendanceSystem = () => {
             return;
         }
         if (createAttendanceRecord(formData.name, 'keluar', formData.customTime, formData.purpose)) {
-            alert('✅ ABSENSI KELUAR BERHASIL DICATAT!');
+             alert('✅ ABSENSI KELUAR BERHASIL DICATAT!');
         }
     };
 
     // --- DATA & STATISTIK ---
-    const filteredAttendances = filterDate ?
-        attendances.filter(a => a.date === new Date(filterDate).toLocaleDateString('id-ID')) :
+    const filteredAttendances = filterDate ? 
+        attendances.filter(a => a.date === new Date(filterDate).toLocaleDateString('id-ID')) : 
         attendances;
-
-    // Sortir riwayat berdasarkan fullTimestamp terbaru dulu
-    const sortedFilteredAttendances = filteredAttendances.sort((a, b) => new Date(b.fullTimestamp) - new Date(a.fullTimestamp));
-
 
     const stats = {
         total: attendances.length,
@@ -252,8 +200,8 @@ const AttendanceSystem = () => {
 
     const exportToCSV = () => {
         const headers = ['TANGGAL', 'WAKTU INPUT', 'NAMA', 'TIPE', 'WAKTU', 'KEPERLUAN', 'LOKASI (Lat, Lng)'];
-        const rows = sortedFilteredAttendances.map(a => [a.date, a.timestamp, a.name, a.type.toUpperCase(), a.customTime, a.purpose || '-', a.location.replace(/,/g, '')]);
-        const csv = [headers, ...rows].map(row => row.join(';')).join('\n');
+        const rows = filteredAttendances.map(a => [a.date, a.timestamp, a.name, a.type.toUpperCase(), a.customTime, a.purpose || '-', a.location.replace(/,/g, '')] );
+        const csv = [headers, ...rows].map(row => row.join(';')).join('\n'); 
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -268,13 +216,13 @@ const AttendanceSystem = () => {
         if (locationData && locationData.includes(',')) {
             const [lat, lng] = locationData.split(',').map(c => c.trim());
             return (
-                <a
-                    href={createMapLink(lat, lng)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <a 
+                    href={createMapLink(lat, lng)} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
                     className="flex items-center text-blue-600 hover:text-blue-800 transition-colors text-xs font-medium"
                 >
-                    <MapPin className="w-4 h-4 mr-1" />
+                    <MapPin className="w-4 h-4 mr-1"/>
                     Lihat di Peta
                 </a>
             );
@@ -287,15 +235,15 @@ const AttendanceSystem = () => {
             <div className="bg-white rounded-xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-end">
                     <button onClick={onClose} className="text-gray-700 hover:text-red-500">
-                        <XCircle className="w-6 h-6" />
+                        <XCircle className="w-6 h-6"/>
                     </button>
                 </div>
                 <h3 className="text-xl font-bold mb-4 text-center">FOTO ABSENSI</h3>
-                <img src={photoUrl} alt="Foto Absensi Karyawan" className="w-full h-auto object-contain rounded-lg shadow-lg max-h-[70vh]" /> {/* max-h untuk responsivitas */}
+                <img src={photoUrl} alt="Foto Absensi Karyawan" className="w-full h-48 object-cover rounded-lg shadow-lg" />
             </div>
         </div>
     );
-
+    
     // --- RENDER UTAMA ---
 
     // Tampilan 1: Login Server atau Pegawai
@@ -329,48 +277,48 @@ const AttendanceSystem = () => {
                     {/* Login Server */}
                     {view === 'server' && !isServerAuth ? (
                         <div className="bg-white rounded-xl shadow-2xl p-8 border border-gray-200">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2"><Lock className="w-6 h-6 text-indigo-600" /> LOGIN SERVER</h2>
+                            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2"><Lock className="w-6 h-6 text-indigo-600"/> LOGIN SERVER</h2>
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">PASSWORD</label>
-                                    <input
-                                        type="password"
-                                        value={serverPassword}
+                                    <input 
+                                        type="password" 
+                                        value={serverPassword} 
                                         onChange={(e) => setServerPassword(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && handleServerLogin()}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 uppercase shadow-inner transition-shadow"
-                                        placeholder="MASUKKAN PASSWORD SERVER"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 uppercase shadow-inner transition-shadow" 
+                                        placeholder="MASUKKAN PASSWORD SERVER" 
                                     />
                                 </div>
                                 <button onClick={handleServerLogin} className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-xl shadow-indigo-300/80" >
-                                    <LogIn className="w-5 h-5 inline mr-2" /> LOGIN
+                                    <LogIn className="w-5 h-5 inline mr-2"/> LOGIN
                                 </button>
-                                <button onClick={() => setView('employee')} className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors" >
-                                    <Home className="w-4 h-4 inline mr-2" /> KEMBALI KE ABSENSI
+                                <button onClick={() => setView('employee')} className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors" > 
+                                    <Home className="w-4 h-4 inline mr-2"/> KEMBALI KE ABSENSI
                                 </button>
                             </div>
                         </div>
                     ) : (
                         /* Tampilan Absensi Pegawai */
                         <div className="space-y-6">
-
+                            
                             {/* Mode Switch & Lokasi - Dibuat Lebih Rapi */}
                             <div className="bg-white rounded-xl shadow-lg p-4 flex flex-col md:flex-row justify-between items-center gap-4 border border-gray-200">
                                 <div className="flex gap-3 w-full md:w-auto">
-                                    <button
-                                        onClick={() => setAttendanceMode('keluar')}
+                                    <button 
+                                        onClick={() => setAttendanceMode('keluar')} 
                                         className={`flex-1 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm shadow-md ${
                                             attendanceMode === 'keluar' ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-red-300/50' : 'bg-gray-100 text-gray-700 hover:bg-orange-50'
                                         }`}
                                     >
-                                        <LogOut className="w-5 h-5" /> ABSEN KELUAR
+                                        <LogOut className="w-5 h-5" /> ABSEN KELUAR 
                                     </button>
-                                    <button
-                                        onClick={() => setAttendanceMode('masuk')}
+                                    <button 
+                                        onClick={() => setAttendanceMode('masuk')} 
                                         className={`flex-1 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-sm shadow-md ${
                                             attendanceMode === 'masuk' ? 'bg-gradient-to-r from-green-500 to-teal-600 text-white shadow-teal-300/50' : 'bg-gray-100 text-gray-700 hover:bg-green-50'
                                         }`}
-                                    >
+                                    > 
                                         <LogIn className="w-5 h-5" /> ABSEN MASUK
                                     </button>
                                 </div>
@@ -378,17 +326,17 @@ const AttendanceSystem = () => {
                                     <p className="text-xs text-gray-500">POSISI ANDA:</p>
                                     <div className="flex items-center justify-center md:justify-end">
                                         {location ? (
-                                            <a
-                                                href={createMapLink(location.lat, location.lng)}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                            <a 
+                                                href={createMapLink(location.lat, location.lng)} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer" 
                                                 className={`flex items-center gap-1 text-sm font-bold ${location.failed ? 'text-red-500' : 'text-blue-600 hover:text-blue-700'}`}
                                             >
-                                                <MapPin className="w-4 h-4" />
+                                                <MapPin className="w-4 h-4" /> 
                                                 {location.failed ? 'GPS ERROR' : 'LOKASI TERDETEKSI'}
                                             </a>
                                         ) : (
-                                            <span className="text-sm text-gray-500 flex items-center gap-1"><MapPin className="w-4 h-4 animate-pulse" />Memuat GPS...</span>
+                                            <span className="text-sm text-gray-500 flex items-center gap-1"><MapPin className="w-4 h-4 animate-pulse"/>Memuat GPS...</span>
                                         )}
                                     </div>
                                 </div>
@@ -397,15 +345,15 @@ const AttendanceSystem = () => {
                             {/* Absensi Keluar Mode */}
                             {attendanceMode === 'keluar' ? (
                                 <div className="bg-white rounded-xl shadow-2xl p-6 border-t-8 border-orange-500">
-                                    <h2 className="text-2xl font-extrabold text-gray-800 mb-2 flex items-center"><LogOut className='w-6 h-6 mr-2 text-orange-500' /> ABSENSI KELUAR</h2>
+                                    <h2 className="text-2xl font-extrabold text-gray-800 mb-2 flex items-center"><LogOut className='w-6 h-6 mr-2 text-orange-500'/> ABSENSI KELUAR</h2>
                                     <p className="text-orange-600 text-sm font-bold mb-6 border-b pb-2 border-dashed">Pastikan semua data terisi dan foto selfie Anda jelas.</p>
                                     <div className="space-y-5">
                                         {/* Nama */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">NAMA KARYAWAN <span className='text-red-500'>*</span></label>
-                                            <select
-                                                value={formData.name}
-                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            <select 
+                                                value={formData.name} 
+                                                onChange={(e) => setFormData({...formData, name: e.target.value})} 
                                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 uppercase shadow-inner"
                                             >
                                                 <option value="">-- PILIH NAMA DARI DAFTAR --</option>
@@ -417,31 +365,31 @@ const AttendanceSystem = () => {
                                         {/* Waktu */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">WAKTU KELUAR <span className='text-red-500'>*</span></label>
-                                            <input
-                                                type="time"
-                                                value={formData.customTime}
-                                                onChange={(e) => setFormData({ ...formData, customTime: e.target.value })}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 shadow-inner"
+                                            <input 
+                                                type="time" 
+                                                value={formData.customTime} 
+                                                onChange={(e) => setFormData({...formData, customTime: e.target.value})} 
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 shadow-inner" 
                                             />
                                         </div>
                                         {/* Keperluan */}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">KEPERLUAN <span className='text-red-500'>*</span></label>
-                                            <textarea
-                                                value={formData.purpose}
-                                                onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 uppercase shadow-inner"
-                                                placeholder="Contoh: DINAS LUAR / KEPERLUAN PRIBADI" rows="3"
+                                            <textarea 
+                                                value={formData.purpose} 
+                                                onChange={(e) => setFormData({...formData, purpose: e.target.value})} 
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 uppercase shadow-inner" 
+                                                placeholder="Contoh: DINAS LUAR / KEPERLUAN PRIBADI" rows="3" 
                                             />
                                         </div>
                                         {/* Foto */}
                                         <div className="bg-orange-50 p-4 rounded-xl border border-orange-200">
-                                            <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center"><UserCheck className="w-4 h-4 mr-1 text-orange-600" /> AMBIL FOTO SELFIE (WAJIB) <span className='text-red-500'>*</span></label>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                capture="user"
-                                                onChange={handlePhotoChange}
+                                            <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center"><UserCheck className="w-4 h-4 mr-1 text-orange-600"/> AMBIL FOTO SELFIE (WAJIB) <span className='text-red-500'>*</span></label>
+                                            <input 
+                                                type="file" 
+                                                accept="image/*" 
+                                                capture="user" 
+                                                onChange={handlePhotoChange} 
                                                 className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-200 file:text-orange-800 hover:file:bg-orange-300 transition-colors cursor-pointer"
                                             />
                                             {photoPreview && (
@@ -452,25 +400,25 @@ const AttendanceSystem = () => {
                                             )}
                                         </div>
 
-                                        <button onClick={handleSubmitKeluar} className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-xl font-extrabold hover:from-orange-700 hover:to-red-700 transition-all flex items-center justify-center gap-2 shadow-xl shadow-orange-300/80" >
+                                        <button onClick={handleSubmitKeluar} className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-xl font-extrabold hover:from-orange-700 hover:to-red-700 transition-all flex items-center justify-center gap-2 shadow-xl shadow-orange-300/80" > 
                                             <LogOut className="w-5 h-5" /> SUBMIT ABSENSI KELUAR
                                         </button>
                                     </div>
                                 </div>
-                            ) : (
+                            ) : ( 
                                 {/* Absen Masuk Mode */}
                                 <div className="bg-white rounded-xl shadow-2xl p-6 border-t-8 border-green-500">
-                                    <h2 className="text-2xl font-extrabold text-gray-800 mb-2 flex items-center"><LogIn className='w-6 h-6 mr-2 text-green-500' /> ABSENSI MASUK</h2>
+                                    <h2 className="text-2xl font-extrabold text-gray-800 mb-2 flex items-center"><LogIn className='w-6 h-6 mr-2 text-green-500'/> ABSENSI MASUK</h2>
                                     <p className="text-gray-600 text-sm mb-6 border-b pb-2 border-dashed">Langkah Cepat: Ambil foto, lalu tekan nama Anda untuk absen.</p>
 
                                     {/* Foto */}
                                     <div className="mb-6 bg-green-50 p-4 rounded-xl border border-green-200">
-                                        <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center"><UserCheck className="w-4 h-4 mr-1 text-green-600" /> AMBIL FOTO SELFIE (WAJIB) <span className='text-red-500'>*</span></label>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            capture="user"
-                                            onChange={handlePhotoChange}
+                                        <label className="block text-sm font-bold text-gray-700 mb-3 flex items-center"><UserCheck className="w-4 h-4 mr-1 text-green-600"/> AMBIL FOTO SELFIE (WAJIB) <span className='text-red-500'>*</span></label>
+                                        <input 
+                                            type="file" 
+                                            accept="image/*" 
+                                            capture="user" 
+                                            onChange={handlePhotoChange} 
                                             className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-200 file:text-green-800 hover:file:bg-green-300 transition-colors cursor-pointer"
                                         />
                                         {photoPreview && (
@@ -486,9 +434,9 @@ const AttendanceSystem = () => {
                                         <label className="block text-base font-extrabold text-gray-800 mb-4">PILIH NAMA ANDA DI BAWAH <span className='text-red-500'>*</span></label>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto p-2 bg-gray-50 rounded-lg border border-gray-200">
                                             {employeeList.map((name) => (
-                                                <button
-                                                    key={name}
-                                                    onClick={() => handleQuickAttendance(name)}
+                                                <button 
+                                                    key={name} 
+                                                    onClick={() => handleQuickAttendance(name)} 
                                                     className="w-full text-left px-4 py-3 bg-white border border-green-300 rounded-xl hover:bg-green-50 hover:border-green-500 transition-all font-semibold text-gray-800 flex items-center justify-between group shadow-md text-sm"
                                                 >
                                                     <span>{name}</span>
@@ -511,7 +459,7 @@ const AttendanceSystem = () => {
         <div className="min-h-screen bg-gray-100 p-4 font-sans antialiased">
             {showPhotoModal && <PhotoModal photoUrl={currentPhoto} onClose={() => setShowPhotoModal(false)} />}
             <div className="max-w-7xl mx-auto">
-
+                
                 {/* Header Server */}
                 <div className="bg-white rounded-xl shadow-2xl p-6 mb-6 border-b-4 border-indigo-600">
                     <div className="flex justify-between items-start">
@@ -524,4 +472,33 @@ const AttendanceSystem = () => {
                                 </div>
                                 <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
                                     <Clock className="w-4 h-4 text-indigo-600" />
-                                    <span className="font-mono text-lg font-bold">{
+                                    <span className="font-mono text-lg font-bold">{currentTime.toLocaleTimeString('id-ID')}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onClick={() => { setView('employee'); setIsServerAuth(false); setServerPassword(''); }} className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors font-medium shadow-md text-sm" >
+                            LOGOUT <LogOut className="w-4 h-4 inline ml-1"/>
+                        </button>
+                    </div>
+
+                    {/* Tabs Navigation */}
+                    <div className="flex bg-gray-200 rounded-xl p-2 gap-2 mt-6">
+                        <button 
+                            onClick={() => setActiveTab('dashboard')}
+                            className={`flex-1 px-6 py-3 text-sm font-semibold rounded-lg transition-all ${
+                                activeTab === 'dashboard' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-700 hover:bg-gray-300'
+                            } ${serverType === 'pkd' ? 'hidden' : ''}`} // Sembunyikan untuk PKD
+                        >
+                            <Users className="w-4 h-4 inline mr-2"/> DASHBOARD
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('riwayat')}
+                            className={`flex-1 px-6 py-3 text-sm font-semibold rounded-lg transition-all ${
+                                activeTab === 'riwayat' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-700 hover:bg-gray-300'
+                            }`}
+                        >
+                            <FileText className="w-4 h-4 inline mr-2"/> RIWAYAT ABSENSI
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('pengaturan')}
+                            className
